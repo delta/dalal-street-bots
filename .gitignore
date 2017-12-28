@@ -1,1 +1,3 @@
 venv/*
+bots/proto_build/*
+.vscode/*
