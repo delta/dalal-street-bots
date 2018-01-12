@@ -1,4 +1,5 @@
 venv/*
+dalalstreetbots/proto_build/*
 bots/proto_build/*
 .vscode/*
 *.pyc

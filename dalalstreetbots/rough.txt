@@ -1,0 +1,60 @@
+Framework design:
+
+1. MarketMessenger:
+    Talks to the grpc server, used to keep an up-to-date copy of stockprices, stockexchange,
+    marketdepth of all stocks, market-open-close, market events, creating bots, placing orders
+    on behalf of bots, cancelling orders on behalf of bots, getting leaderboard positions of bots,
+    getting company profile etc....
+
+2. BotManager:
+    uses MarketMessenger and manages bots - creates them, talks to MarketMessenger for each bot
+    to place its orders, or get its data etc. schedules bots.
+    Also supports the web interface.
+
+3. Bot class:
+    provides basic functionality for each bot subclass:
+        getMyCash()
+        getMyTotal()
+        getMyOpenOrders()
+        getMyOwnedStocks()
+
+        getLastTradePrice(stock)
+
+
+Functionality required:
+
+API for management of bots:
+createBot() -> creates a bot in the database, and also registers on dalal server
+
+API for bots:
+
+getters:
+    getMyCash()
+    getMyTotal()
+    getMyOpenOrders()
+    getMyOwnedStocks()
+
+    getLastTradePrice(stock)
+    getOrderBook(stock)
+    getPriceHistory(stock, candleSize, nCandles)
+    # bots won't mortgage stocks.
+
+event setters:
+    setPriceUpdateInterval(interval)
+    setSleepDuration(interval)          # for how long would the bot sleep
+
+interaction with market:
+    PlaceOrder
+    CancelOrder
+    BuyStocksFromExchange
+
+eventHandlers:
+    onPriceUpdate(candle)
+    onNewsUpdate(news)
+
+logging:
+    log()
+    info()
+    debug()
+    warning()
+    error()
