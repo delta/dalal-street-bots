@@ -21,8 +21,11 @@ def main():
     #loop.run_in_executor(None, market_messenger.run,)
     asyncio.ensure_future(market_messenger.start())
 
+    ## EDITABLE STUFF STARTS
     asyncio.ensure_future(bot_manager.load_all_bots())
+    #asyncio.ensure_future(bot_manager.create_bot("DumbBot", "testbot3", "{}"))
     #asyncio.ensure_future(bot_manager.create_bot("DumbBot", "testbot2", '{"sleep_duration": 5}'))
+    ### EDITABLE STUFF ENDS
 
     #bots = bot_manager.get_bots()
     #print(bots, bot_manager.get_bot_types())

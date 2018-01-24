@@ -71,13 +71,13 @@ class BotBase(object):
         self.__should_run = True
         while self.__should_run:
             await asyncio.sleep(self.settings["sleep_duration"])
-            self.update()
+            await self.update()
 
     def pause(self):
         """Pauses the bot's execution. DO NOT OVERRIDE."""
         self.__should_run = False
 
-    def update(self):
+    async def update(self):
         """update method MUST BE OVERRIDDEN by *all* bots inheriting BotBase"""
         pass
 

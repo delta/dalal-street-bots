@@ -33,7 +33,10 @@ class MarketMessenger:
         """Connect to the server"""
         cert = open('grpc-server.crt').read().encode("utf8")
         creds = grpc.ssl_channel_credentials(cert)
-        channel = grpc.secure_channel("localhost:8000", creds)
+        channel = grpc.secure_channel(
+            "139.59.47.250:443",
+            creds,
+            options=(('grpc.ssl_target_name_override', "localhost",),))
 
         self.action_stub = DalalMessage_pb2_grpc.DalalActionServiceStub(channel)
         self.stream_stub = DalalMessage_pb2_grpc.DalalStreamServiceStub(channel)
@@ -71,7 +74,7 @@ class MarketMessenger:
         if bot_userid is None:
             return [("bot_secret", self.bot_secret), ("bot_user_id", "fakeid")]
         else:
-            return [("bot_secret", self.bot_secret), ("bot_user_id", bot_userid)]
+            return [("bot_secret", self.bot_secret), ("bot_user_id", str(bot_userid))]
 
     async def create_bot(self, botname):
         """creates a bot user on the server"""
@@ -165,13 +168,13 @@ class MarketMessenger:
 
         try:
             res = await method(req, metadata=self.__getmd_for_bot(bot_id))
-            if res.status_code != response_class.status_code.OK:
-                raise Exception("Got non OK response code")
-            print("Got response ", res)
+            if res.status_code != response_class.OK:
+                raise Exception("Got non OK response code: " + str(res.status_code))
+            #print("Got response ", res)
         except grpc.RpcError as error:
             status_code = error.code()
             print("Got error while calling " + method_name, type(error), error.details(), status_code.name)
-            raise Exception("Got unexpected error code " + status_code)
+            raise Exception("Got unexpected error code")
 
         return res
 

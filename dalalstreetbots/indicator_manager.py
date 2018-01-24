@@ -23,8 +23,8 @@ class IndicatorManager:
 
         try:
             async for update in stream:
-                for indic_type in self.__indicators__:
-                    for stock_id in self.__indicators__[indic_type]:
+                for stock_id in update:
+                    for indic_type in self.__indicators__:
                         for settings_hash in self.__indicators__[indic_type][stock_id]:
                             indicator = self.__indicators__[indic_type][stock_id][settings_hash]
                             indicator.update(update)
