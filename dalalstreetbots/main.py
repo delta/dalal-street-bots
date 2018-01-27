@@ -23,7 +23,7 @@ def main():
 
     ## EDITABLE STUFF STARTS
     asyncio.ensure_future(bot_manager.load_all_bots())
-    #asyncio.ensure_future(bot_manager.create_bot("DumbBot", "testbot3", "{}"))
+    #asyncio.ensure_future(bot_manager.create_bot("EmaBot", "Primus2 Bot", "{}"))
     #asyncio.ensure_future(bot_manager.create_bot("DumbBot", "testbot2", '{"sleep_duration": 5}'))
     ### EDITABLE STUFF ENDS
 
