@@ -23,11 +23,11 @@ class IndicatorManager:
 
         try:
             async for update in stream:
-                for stock_id in update:
+                for stock_id in update.prices:
                     for indic_type in self.__indicators__:
                         for settings_hash in self.__indicators__[indic_type][stock_id]:
                             indicator = self.__indicators__[indic_type][stock_id][settings_hash]
-                            indicator.update(update)
+                            indicator.update(update.prices[stock_id])
         except Exception as e:
             print("Unexpected error happened: ", e)
 
