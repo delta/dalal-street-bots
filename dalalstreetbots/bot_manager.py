@@ -114,6 +114,8 @@ class BotManager:
                             (userid, bot_name, bot_type, bot_settings, "{}", 0, start_paused))
         self.conn.commit()
 
+        bot = {"type":bot_type, "id":userid, "is_paused":start_paused, "name":bot_name, "settings":json.loads(bot_settings)}
+        await self.load_bot(bot)
         return userid
 
     async def load_all_bots(self):
