@@ -142,7 +142,7 @@ class BotManager:
 
     async def pause_bot(self, bot_id):
         """pause a bot given the bot_id"""
-        if bot_id in self.bot_instances:
+        if bot_id in self.bot_instances.keys():
             self.bot_instances[bot_id].pause()
         else:
             raise Exception("Invalid bot_id!")

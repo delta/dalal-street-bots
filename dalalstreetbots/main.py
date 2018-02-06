@@ -54,9 +54,9 @@ async def pause_bot():
         Pass bot id to it
     """
     data = await request.form
-    bot_id = data['bot_id']
+    bot_id = int(data['bot_id'])
     asyncio.ensure_future(bot_manager.pause_bot(bot_id))
-    return "Bot " + bot_id + " was paused"
+    return "Bot " + str(bot_id) + " was paused"
 
 if __name__ == "__main__":
     app.run()
