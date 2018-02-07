@@ -1,7 +1,6 @@
 """BotBase class"""
 
 import asyncio
-
 class BotBase(object):
     """BotBase class defines the base class for all bots"""
 
@@ -76,6 +75,14 @@ class BotBase(object):
     def pause(self):
         """Pauses the bot's execution. DO NOT OVERRIDE."""
         self.__should_run = False
+
+    def add_to_log(self,bot_id, log_message):
+        """Logs stuff to database
+        """
+        self.__bot_manager.cursor.execute("""insert into logs (
+                                            bot_id, log, created_at) values (?, ?, time('now')
+                                            )""",(bot_id, log_message))
+        self.__bot_manager.conn.commit()
 
     async def update(self):
         """update method MUST BE OVERRIDDEN by *all* bots inheriting BotBase"""

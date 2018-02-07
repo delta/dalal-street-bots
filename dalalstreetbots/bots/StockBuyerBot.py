@@ -19,7 +19,7 @@ class StockBuyerBot(BotBase):
 
     async def update(self, *args, **kwargs):
         """update method MUST BE OVERRIDDEN by *all* bots inheriting BotBase"""
-        pass
+        print("StockBuyerBot(" + self.name + ") was called")
 
         if not self.__bought:
             random_stock = 1
@@ -29,6 +29,7 @@ class StockBuyerBot(BotBase):
                 stock_price  = stock_price + stock_price*random_const
                 stock_price  = int(stock_price)
                 await self.place_buy_order(random_stock, 1, stock_price, 1)
-                print("StockBuyerBot(" + self.name + ") bought ", str(random_stock))
+                log_message = "StockBuyerBot(" + self.name + ") bought ", str(random_stock)
             else:
-                print("StockBuyerBot didn't buy shit")
+                log_message = "StockBuyerBot(" + self.name + ") bought nothing"
+            self.add_to_log(self.id, log_message)

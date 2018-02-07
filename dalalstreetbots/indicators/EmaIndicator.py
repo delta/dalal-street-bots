@@ -16,7 +16,6 @@ class EmaIndicator(IndicatorBase):
     def update(self, update):
         self.prices.append(update)
         self.prices_length = self.prices_length + 1
-        self.results['latest_price'] = update
 
         if (self.prices_length < self.k):
             # Do nothing if you are here. You don't have enough data
