@@ -147,6 +147,21 @@ class BotManager:
         else:
             raise Exception("Invalid bot_id!")
 
+    async def get_log(self, id):
+        return_data = {"message":"no data found"}
+        if (id == "-1"):
+            data = self.cursor.execute("select * from logs;")
+        else:
+            data = self.cursor.execute("select * from logs where bot_id = " + str(id) + ";")
+        i = 0
+        if data:
+            return_data = {}
+            for row in data:
+                return_data[i] = [row[0], row[1], row[2]]
+                i = i + 1
+
+        return json.dumps(return_data)
+
     def get_bots(self):
         """get_bots returns a list of all bot instances"""
         self.cursor.execute("SELECT id, name, type, settings, run_count, is_paused, created_at from bots")

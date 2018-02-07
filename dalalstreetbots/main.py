@@ -36,9 +36,9 @@ async def loadAll():
 
 @app.route('/createbot', methods=['POST'])
 async def create_bot():
-    """ This route creates bots.
-        bot_type
-        number
+    """Route to create bots
+        - bot_type
+        - number
     """
     data = await request.form
     bot_type = data['bot_type']
@@ -50,13 +50,37 @@ async def create_bot():
 
 @app.route('/pausebot', methods=['POST'])
 async def pause_bot():
-    """ This is a route to pause bots
-        Pass bot id to it
+    """Route to pause bots
+        - bot_id
     """
     data = await request.form
     bot_id = int(data['bot_id'])
     asyncio.ensure_future(bot_manager.pause_bot(bot_id))
     return "Bot " + str(bot_id) + " was paused"
+
+@app.route('/getdetails', methods=['POST'])
+async def get_details():
+    """Route to get bot details
+        - bot_id
+    """
+    data = await request.form
+    bot_id = int(data['bot_id'])
+    return_data = await asyncio.ensure_future(market_messenger.get_portfolio(bot_id))
+    print(return_data.user)
+    return "done"
+
+@app.route("/getlogs", methods=['POST'])
+async def get_logs():
+    """Route returns bot logs
+        - bot_id ( if bot_id == -1, send all )
+    """
+    data = await request.form
+    bot_id   = data['id']
+
+    if bot_id == -1:
+        return await bot_manager.get_log(-1)
+    else:
+        return await bot_manager.get_log(bot_id)
 
 if __name__ == "__main__":
     app.run()
