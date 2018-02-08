@@ -75,6 +75,12 @@ class BotBase(object):
     def pause(self):
         """Pauses the bot's execution. DO NOT OVERRIDE."""
         self.__should_run = False
+        self.__is_running = False
+
+    def unpause(self):
+        """Unpause the bot's execution"""
+        self.__should_run = True
+        asyncio.ensure_future(self.run())
 
     def add_to_log(self,bot_id, log_message):
         """Logs stuff to database

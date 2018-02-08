@@ -147,6 +147,14 @@ class BotManager:
         else:
             raise Exception("Invalid bot_id!")
 
+    async def unpause_bot(self, bot_id):
+        """unpause a bot given the bot_id"""
+        if bot_id in self.bot_instances.keys():
+            self.bot_instances[bot_id].unpause()
+
+        else:
+            raise Exception("Invalid bot_id!")
+
     async def get_log(self, id):
         return_data = {"message":"no data found"}
         if (id == "-1"):

@@ -24,7 +24,7 @@ IS_INITIALIZED = False
 async def hello():
     return 'hello'
 
-@app.route('/loadall')
+@app.route('/loadall', methods=['POST'])
 async def loadAll():
     global IS_INITIALIZED
     if not IS_INITIALIZED:
@@ -55,8 +55,18 @@ async def pause_bot():
     """
     data = await request.form
     bot_id = int(data['bot_id'])
-    asyncio.ensure_future(bot_manager.pause_bot(bot_id))
+    await bot_manager.pause_bot(bot_id)
     return "Bot " + str(bot_id) + " was paused"
+
+@app.route('/unpausebot', methods=['POST'])
+async def unpause_bot():
+    """Route to unpause bots
+        - bot_id
+    """
+    data = await request.form
+    bot_id = int(data['bot_id'])
+    await bot_manager.unpause_bot(bot_id)
+    return "Bot " + str(bot_id) + " was unpaused"
 
 @app.route('/getdetails', methods=['POST'])
 async def get_details():
