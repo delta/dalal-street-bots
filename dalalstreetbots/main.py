@@ -5,6 +5,9 @@ from market_messenger import MarketMessenger
 from bot_manager import BotManager
 from indicator_manager import IndicatorManager
 
+from google.protobuf.json_format import MessageToJson
+
+import json
 from quart import Quart, request
 
 app = Quart(__name__)
@@ -41,10 +44,11 @@ async def create_bot():
         - number
     """
     data = await request.form
+    bot_settings = data['bot_settings']
     bot_type = data['bot_type']
     bot_name = data['bot_name']
     sleep_duration = data['sleep_duration']
-    asyncio.ensure_future(bot_manager.create_bot(bot_type, bot_name,"{}"))
+    asyncio.ensure_future(bot_manager.create_bot(bot_type, bot_name, bot_settings))
 
     return "Bot " + bot_name + " of type " + bot_type + " was created"
 
@@ -76,8 +80,8 @@ async def get_details():
     data = await request.form
     bot_id = int(data['bot_id'])
     return_data = await asyncio.ensure_future(market_messenger.get_portfolio(bot_id))
-    print(return_data.user)
-    return "done"
+
+    return MessageToJson(return_data)
 
 @app.route("/getlogs", methods=['POST'])
 async def get_logs():
@@ -85,7 +89,7 @@ async def get_logs():
         - bot_id ( if bot_id == -1, send all )
     """
     data = await request.form
-    bot_id   = data['id']
+    bot_id   = data['bot_id']
 
     if bot_id == -1:
         return await bot_manager.get_log(-1)
