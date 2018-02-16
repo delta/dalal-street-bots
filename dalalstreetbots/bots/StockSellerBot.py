@@ -28,7 +28,7 @@ class StockSellerBot(BotBase):
                 random_const = float(decimal.Decimal(random.randrange(-5,5))/100)
                 stock_price = (1+random_const)*stock_price
                 stock_price = int(stock_price)
-                await self.place_sell_order(random_stock, 1, stock_price)
+                await self.place_sell_order(random_stock, self.settings["stocks_per_company"], stock_price)
                 log_message = "StockBuyerBot(" + self.name + ") bought ", str(random_stock)
             else:
                 log_message = "StockBuyerBot(" + self.name + ") bought nothing"

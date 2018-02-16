@@ -9,14 +9,12 @@ class RSIBot(BotBase):
     }
 
     def __init__(self):
-        self.holding_time = 3 # how long to hold before selling
         self.current_time = 0 # how many instances have occured since last buying 
-        self.buy_limit = 3 # how many companies to buy at a time
         self.company_list = [] # array of [company_id, rsi, latest_price]
 
     async def load_indicators(self):
         self.rsiindicator = {}
-        for i in range(1,10):
+        for i in range(1, self.settings["no_of_companies"]):
             self.rsiindicator[i] = await self.get_indicator("RSIIndicator", i, {})
 
     async def update(self, *args, **kwargs):
@@ -28,7 +26,7 @@ class RSIBot(BotBase):
             # if you already have bought some companies previously, sell them off and buy new ones
             if len(self.company_list) != 0 :
                 for my_company in self.company_list:
-                    await self.place_sell_order(my_company[0], 3, my_company[2])
+                    await self.place_sell_order(my_company[0], self.settings["stocks_per_company"], my_company[2])
                     log_message = "RSI(" + self.name + ") sold stocks of company" + str(my_company[0])
                     self.add_to_log(self.id, log_message)
 
@@ -38,7 +36,7 @@ class RSIBot(BotBase):
                 self.add_to_log(self.id, log_message)
 
             # now select companies based on rsi indicator
-            for i in range(1,10):
+            for i in range(1, self.settings["no_of_companies"]):
                 rsi = self.rsiindicator[i].results.get('rsi')
                 if (rsi):
                     latest_price = self.rsiindicator[i].prices[-1]
@@ -50,7 +48,7 @@ class RSIBot(BotBase):
             # now start buying off the stocks
             i = 0
             while i<length:
-                await self.buy_stocks_from_exchange(company[0], 3)
+                await self.buy_stocks_from_exchange(company[0], self.settings["stocks_per_company"])
                 log_message = "RSIBot(" + self.name + ") bought stock " + str(self.company_list[i])
                 self.add_to_log(self.id, log_message)
                 i = i+1

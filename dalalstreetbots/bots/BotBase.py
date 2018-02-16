@@ -1,11 +1,16 @@
 """BotBase class"""
 
 import asyncio
+import json
 class BotBase(object):
     """BotBase class defines the base class for all bots"""
 
     default_settings = {
         "sleep_duration": 15, # in seconds. THIS SETTING IS REQUIRED
+        "buy_limit": 3, # number of companies to buy at a time
+        "stocks_per_company":3, # how many stocks per company do you want to buy at a time
+        "holding_time": 5, # how many rounds to hold before you sell your stocks off
+        "no_of_companies": 10 # number of companies to buy from
     }
 
     async def _hidden_init_(self, id, name, settings, bot_manager, indicator_manager, market_messenger):
@@ -14,7 +19,7 @@ class BotBase(object):
         self.name = name         # name is unique to each bot
         self.settings = {**self.default_settings, **settings} # override default settings with custom
 
-        print(self.name, "init", self.settings, self.default_settings)
+        print(self.name, " final settings ", self.settings)
 
         self.__bot_manager = bot_manager # keep the bot_manager private
         self.__indicator_manager = indicator_manager # keep the indicator_manager private
