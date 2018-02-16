@@ -114,6 +114,8 @@ class BotManager:
                             (userid, bot_name, bot_type, bot_settings, "{}", 0, start_paused))
         self.conn.commit()
 
+        bot = {"type":bot_type, "id":userid, "is_paused":start_paused, "name":bot_name, "settings":bot_settings}
+        await self.load_bot(bot)
         return userid
 
     async def load_all_bots(self):
@@ -140,10 +142,33 @@ class BotManager:
 
     async def pause_bot(self, bot_id):
         """pause a bot given the bot_id"""
-        if bot_id in self.bot_instances:
+        if bot_id in self.bot_instances.keys():
             self.bot_instances[bot_id].pause()
         else:
             raise Exception("Invalid bot_id!")
+
+    async def unpause_bot(self, bot_id):
+        """unpause a bot given the bot_id"""
+        if bot_id in self.bot_instances.keys():
+            self.bot_instances[bot_id].unpause()
+
+        else:
+            raise Exception("Invalid bot_id!")
+
+    async def get_log(self, id):
+        return_data = {"message":"no data found"}
+        if (id == "-1"):
+            data = self.cursor.execute("select * from logs;")
+        else:
+            data = self.cursor.execute("select * from logs where bot_id = " + str(id) + ";")
+        i = 0
+        if data:
+            return_data = {}
+            for row in data:
+                return_data[i] = [row[0], row[1], row[2]]
+                i = i + 1
+
+        return json.dumps(return_data)
 
     def get_bots(self):
         """get_bots returns a list of all bot instances"""

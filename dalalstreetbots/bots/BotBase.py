@@ -1,12 +1,16 @@
 """BotBase class"""
 
 import asyncio
-
+import json
 class BotBase(object):
     """BotBase class defines the base class for all bots"""
 
     default_settings = {
         "sleep_duration": 15, # in seconds. THIS SETTING IS REQUIRED
+        "buy_limit": 3, # number of companies to buy at a time
+        "stocks_per_company":3, # how many stocks per company do you want to buy at a time
+        "holding_time": 5, # how many rounds to hold before you sell your stocks off
+        "no_of_companies": 10 # number of companies to buy from
     }
 
     async def _hidden_init_(self, id, name, settings, bot_manager, indicator_manager, market_messenger):
@@ -15,7 +19,7 @@ class BotBase(object):
         self.name = name         # name is unique to each bot
         self.settings = {**self.default_settings, **settings} # override default settings with custom
 
-        print(self.name, "init", self.settings, self.default_settings)
+        print(self.name, " final settings ", self.settings)
 
         self.__bot_manager = bot_manager # keep the bot_manager private
         self.__indicator_manager = indicator_manager # keep the indicator_manager private
@@ -44,10 +48,10 @@ class BotBase(object):
             self.id, stock_id, stock_quantity
         )
 
-    async def place_buy_order(self, stock_id, stock_quantity, price):
+    async def place_buy_order(self, stock_id, stock_quantity, price, order_type):
         """place Bid order"""
         return await self.__market_messenger.place_buy_order(
-            self.id, stock_id, stock_quantity, price
+            self.id, stock_id, stock_quantity, price, order_type
         )
 
     async def place_sell_order(self, stock_id, stock_quantity, price):
@@ -76,6 +80,20 @@ class BotBase(object):
     def pause(self):
         """Pauses the bot's execution. DO NOT OVERRIDE."""
         self.__should_run = False
+        self.__is_running = False
+
+    def unpause(self):
+        """Unpause the bot's execution"""
+        self.__should_run = True
+        asyncio.ensure_future(self.run())
+
+    def add_to_log(self,bot_id, log_message):
+        """Logs stuff to database
+        """
+        self.__bot_manager.cursor.execute("""insert into logs (
+                                            bot_id, log, created_at) values (?, ?, time('now')
+                                            )""",(bot_id, log_message))
+        self.__bot_manager.conn.commit()
 
     async def update(self):
         """update method MUST BE OVERRIDDEN by *all* bots inheriting BotBase"""

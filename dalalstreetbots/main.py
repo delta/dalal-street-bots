@@ -1,5 +1,3 @@
-"""Test script"""
-
 import asyncio
 from multiprocessing import cpu_count
 from concurrent.futures import ThreadPoolExecutor
@@ -7,31 +5,96 @@ from market_messenger import MarketMessenger
 from bot_manager import BotManager
 from indicator_manager import IndicatorManager
 
-def main():
-    """Master controller"""
-    loop = asyncio.get_event_loop()
-    #executor = ThreadPoolExecutor(max_workers=cpu_count()*5) # max_workers defaults to this in Py3.5.
+from google.protobuf.json_format import MessageToJson
 
-    #loop.set_default_executer(executor)
+import json
+from quart import Quart, request
 
-    market_messenger = MarketMessenger(loop)
-    indicator_manager = IndicatorManager(market_messenger)
-    bot_manager = BotManager(market_messenger, indicator_manager, loop)
+app = Quart(__name__)
 
-    #loop.run_in_executor(None, market_messenger.run,)
-    asyncio.ensure_future(market_messenger.start())
+loop = asyncio.get_event_loop()
 
-    ## EDITABLE STUFF STARTS
-    asyncio.ensure_future(bot_manager.load_all_bots())
-    #asyncio.ensure_future(bot_manager.create_bot("EmaBot", "Primus2 Bot", "{}"))
-    #asyncio.ensure_future(bot_manager.create_bot("DumbBot", "testbot2", '{"sleep_duration": 5}'))
-    ### EDITABLE STUFF ENDS
+# load utilities
+market_messenger = MarketMessenger(loop)
+indicator_manager = IndicatorManager(market_messenger)
+bot_manager = BotManager(market_messenger, indicator_manager, loop)
+asyncio.ensure_future(market_messenger.start())
 
-    #bots = bot_manager.get_bots()
-    #print(bots, bot_manager.get_bot_types())
+# global variables for ass saving
+IS_INITIALIZED = False
 
-    loop.run_forever()
-    loop.close()
+@app.route('/')
+async def hello():
+    return 'hello'
+
+@app.route('/loadall', methods=['POST'])
+async def loadAll():
+    global IS_INITIALIZED
+    if not IS_INITIALIZED:
+        asyncio.ensure_future(bot_manager.load_all_bots())
+        IS_INITIALIZED = True
+        return "initialized"
+    else:
+        return "already initialized"
+
+@app.route('/createbot', methods=['POST'])
+async def create_bot():
+    """Route to create bots
+        - bot_type
+        - number
+    """
+    data = await request.form
+    bot_settings = data['bot_settings']
+    bot_type = data['bot_type']
+    bot_name = data['bot_name']
+    sleep_duration = data['sleep_duration']
+    asyncio.ensure_future(bot_manager.create_bot(bot_type, bot_name, bot_settings))
+
+    return "Bot " + bot_name + " of type " + bot_type + " was created"
+
+@app.route('/pausebot', methods=['POST'])
+async def pause_bot():
+    """Route to pause bots
+        - bot_id
+    """
+    data = await request.form
+    bot_id = int(data['bot_id'])
+    await bot_manager.pause_bot(bot_id)
+    return "Bot " + str(bot_id) + " was paused"
+
+@app.route('/unpausebot', methods=['POST'])
+async def unpause_bot():
+    """Route to unpause bots
+        - bot_id
+    """
+    data = await request.form
+    bot_id = int(data['bot_id'])
+    await bot_manager.unpause_bot(bot_id)
+    return "Bot " + str(bot_id) + " was unpaused"
+
+@app.route('/getdetails', methods=['POST'])
+async def get_details():
+    """Route to get bot details
+        - bot_id
+    """
+    data = await request.form
+    bot_id = int(data['bot_id'])
+    return_data = await asyncio.ensure_future(market_messenger.get_portfolio(bot_id))
+
+    return MessageToJson(return_data)
+
+@app.route("/getlogs", methods=['POST'])
+async def get_logs():
+    """Route returns bot logs
+        - bot_id ( if bot_id == -1, send all )
+    """
+    data = await request.form
+    bot_id   = data['bot_id']
+
+    if bot_id == -1:
+        return await bot_manager.get_log(-1)
+    else:
+        return await bot_manager.get_log(bot_id)
 
 if __name__ == "__main__":
-    main()
+    app.run()
