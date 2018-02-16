@@ -27,6 +27,11 @@ IS_INITIALIZED = False
 async def hello():
     return 'hello'
 
+@app.route('/getbotlist', methods=['POST'])
+async def getbotlist():
+    return_data = bot_manager.get_bots()
+    return json.dumps(return_data)
+
 @app.route('/loadall', methods=['POST'])
 async def loadAll():
     global IS_INITIALIZED
@@ -47,7 +52,6 @@ async def create_bot():
     bot_settings = data['bot_settings']
     bot_type = data['bot_type']
     bot_name = data['bot_name']
-    sleep_duration = data['sleep_duration']
     asyncio.ensure_future(bot_manager.create_bot(bot_type, bot_name, bot_settings))
 
     return "Bot " + bot_name + " of type " + bot_type + " was created"
