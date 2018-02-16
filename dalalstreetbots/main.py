@@ -32,6 +32,16 @@ async def getbotlist():
     return_data = bot_manager.get_bots()
     return json.dumps(return_data)
 
+@app.route('/pausetype', methods=['POST'])
+async def pausetype():
+    bots = bot_manager.get_bots()
+    data = await request.form
+    bot_type = data['bot_type']
+    for bot in bots:
+        if bot['type'] == bot_type:
+            await bot_manager.pause_bot(bot['id'])
+    return "bots paused"
+
 @app.route('/loadall', methods=['POST'])
 async def loadAll():
     global IS_INITIALIZED
