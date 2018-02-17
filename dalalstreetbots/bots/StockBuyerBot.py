@@ -7,6 +7,11 @@ class StockBuyerBot(BotBase):
 
     default_settings = {
         "sleep_duration": 15, # in seconds. THIS SETTING IS REQUIRED
+        "buy_limit": 3, # number of companies to buy at a time
+        "stocks_per_company":3, # how many stocks per company do you want to buy at a time
+        "holding_time": 5, # how many rounds to hold before you sell your stocks off
+        "no_of_companies": 10, # number of companies to buy from
+        "bot_tag": "unset", # special tags for searching purpose
     }
 
     def __init__(self):
@@ -28,8 +33,8 @@ class StockBuyerBot(BotBase):
                 random_const = float(decimal.Decimal(random.randrange(-5,5))/100)
                 stock_price  = stock_price + stock_price*random_const
                 stock_price  = int(stock_price)
-                await self.place_buy_order(random_stock, self.settings["stocks_per_stock"], stock_price, 1)
-                log_message = "StockBuyerBot(" + self.name + ") bought ", str(random_stock)
+                await self.place_buy_order(random_stock, self.settings["stocks_per_company"], stock_price, 1)
+                log_message = "StockBuyerBot(" + self.name + ") bought " + str(random_stock)
             else:
                 log_message = "StockBuyerBot(" + self.name + ") bought nothing"
             self.add_to_log(self.id, log_message)

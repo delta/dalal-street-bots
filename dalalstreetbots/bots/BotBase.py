@@ -18,7 +18,7 @@ class BotBase(object):
         self.id = id
         self.name = name         # name is unique to each bot
         self.settings = {**self.default_settings, **settings} # override default settings with custom
-
+        print("shitka",self.default_settings)
         print(self.name, " final settings ", self.settings)
 
         self.__bot_manager = bot_manager # keep the bot_manager private
