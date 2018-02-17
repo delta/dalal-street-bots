@@ -29,7 +29,7 @@ class EmaBot(BotBase):
             })
 
     async def update(self, *args, **kwargs):
-        print("This is the settings i'm going to run with",self.settings)
+        print("EmaBot(" + self.name + ") has run")
         if self.current_time == self.settings['holding_time']:
             # if you you held for long enough, sell what you bought and buy fresh
             self.current_time = 0
