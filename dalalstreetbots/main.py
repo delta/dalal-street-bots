@@ -51,6 +51,22 @@ async def pausetype():
         print(e)
         return e
 
+@app.route('/unpausetype', methods=['POST'])
+async def unpausetype():
+    try:
+        if IS_INITIALIZED == False:
+            return "Not initialized"
+        bots = bot_manager.get_bots()
+        data = await request.form
+        bot_type = data['bot_type']
+        for bot in bots:
+            if bot['type'] == bot_type:
+                await bot_manager.unpause_bot(bot['id'])
+        return "bots paused"
+    except Exception as e:
+        print(e)
+        return e
+
 @app.route('/pausetags', methods=['POST'])
 async def pausetag():
     try:
@@ -63,6 +79,23 @@ async def pausetag():
             bot_tag = bot['settings'].get('bot_tag')
             if bot_tag == required_tag:
                 await bot_manager.pause_bot(bot['id'])
+        return "bots paused"
+    except Exception as e:
+        print(e)
+        return e
+
+@app.route('/unpausetags', methods=['POST'])
+async def unpausetag():
+    try:
+        if IS_INITIALIZED == False:
+            return "Not initialized"
+        bots = bot_manager.get_bots()
+        data = await request.form
+        required_tag = data['bot_tag']
+        for bot in bots:
+            bot_tag = bot['settings'].get('bot_tag')
+            if bot_tag == required_tag:
+                await bot_manager.unpause_bot(bot['id'])
         return "bots paused"
     except Exception as e:
         print(e)
