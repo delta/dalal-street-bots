@@ -38,6 +38,8 @@ async def getbotlist():
 @app.route('/pausetype', methods=['POST'])
 async def pausetype():
     try:
+        if IS_INITIALIZED == False:
+            return "Not initialized"
         bots = bot_manager.get_bots()
         data = await request.form
         bot_type = data['bot_type']
@@ -52,6 +54,8 @@ async def pausetype():
 @app.route('/pausetags', methods=['POST'])
 async def pausetag():
     try:
+        if IS_INITIALIZED == False:
+            return "Not initialized"
         bots = bot_manager.get_bots()
         data = await request.form
         required_tag = data['bot_tag']
@@ -102,6 +106,8 @@ async def pause_bot():
         - bot_id
     """
     try:
+        if IS_INITIALIZED == False:
+            return "Not initialized"
         data = await request.form
         bot_id = int(data['bot_id'])
         await bot_manager.pause_bot(bot_id)
@@ -116,6 +122,8 @@ async def unpause_bot():
         - bot_id
     """
     try:
+        if IS_INITIALIZED == False:
+            return "Not initialized"
         data = await request.form
         bot_id = int(data['bot_id'])
         await bot_manager.unpause_bot(bot_id)
