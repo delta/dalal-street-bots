@@ -22,14 +22,13 @@ class EmaBot(BotBase):
 
     async def load_indicators(self):
         self.emaindicator = {}
-        for i in range(1, self.settings["no_of_companies"]):
+        for i in range(1, self.settings["no_of_companies"]+1):
             self.emaindicator[i] = await self.get_indicator("EmaIndicator", i, {
                 "type": "prices",
                 "k": self.settings['k']
             })
 
     async def update(self, *args, **kwargs):
-        print("EmaBot(" + self.name + ") has run")
         if self.current_time == self.settings['holding_time']:
             # if you you held for long enough, sell what you bought and buy fresh
             self.current_time = 0
@@ -47,10 +46,10 @@ class EmaBot(BotBase):
             # after you have sold off all your previous stocks, first see which stocks are good
             self.company_list = []
 
-            for i in range(1, self.settings["no_of_companies"]):
+            for i in range(1, self.settings['no_of_companies'] + 1):
                 ema = self.emaindicator[i].results.get('ema_ratio')
-                latest_price = self.emaindicator[i].prices[-1]
-                if (ema):
+                if ema:
+                    latest_price = self.emaindicator[i].prices[-1]
                     self.company_list.append([i,ema,latest_price])
             
             self.company_list.sort(key=lambda x: x[1], reverse=True)
