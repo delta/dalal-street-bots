@@ -10,8 +10,7 @@ class BotBase(object):
         self.id = id
         self.name = name         # name is unique to each bot
         self.settings = {**self.settings, **settings} # gives custom settings
-        print(self.name, " final settings ", self.settings)
-
+        print(self.name + " initialized")
         self.__bot_manager = bot_manager # keep the bot_manager private
         self.__indicator_manager = indicator_manager # keep the indicator_manager private
         self.__market_messenger = market_messenger # keep the market messenger private
