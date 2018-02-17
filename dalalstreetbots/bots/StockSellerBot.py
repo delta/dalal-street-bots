@@ -14,6 +14,8 @@ class StockSellerBot(BotBase):
     }
 
     def __init__(self):
+        self.settings = {}
+        self.settings = {**self.default_settings, **self.settings}
         self.__bought = False
 
     async def load_indicators(self):

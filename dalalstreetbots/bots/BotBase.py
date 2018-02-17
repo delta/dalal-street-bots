@@ -5,20 +5,11 @@ import json
 class BotBase(object):
     """BotBase class defines the base class for all bots"""
 
-    default_settings = {
-        "sleep_duration": 15, # in seconds. THIS SETTING IS REQUIRED
-        "buy_limit": 3, # number of companies to buy at a time
-        "stocks_per_company":3, # how many stocks per company do you want to buy at a time
-        "holding_time": 5, # how many rounds to hold before you sell your stocks off
-        "no_of_companies": 10 # number of companies to buy from
-    }
-
     async def _hidden_init_(self, id, name, settings, bot_manager, indicator_manager, market_messenger):
         """_hidden_init is used by the Bot Manager. DO NOT OVERRIDE"""
         self.id = id
         self.name = name         # name is unique to each bot
-        self.settings = {**self.default_settings, **settings} # override default settings with custom
-        print("shitka",self.default_settings)
+        self.settings = {**self.settings, **settings} # gives custom settings
         print(self.name, " final settings ", self.settings)
 
         self.__bot_manager = bot_manager # keep the bot_manager private

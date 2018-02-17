@@ -4,13 +4,19 @@ class EmaBot(BotBase):
     """The simplest of all the bots. 
     If you lose to this bot, then you should reconsider a future in the market."""
 
-    specific_settings = {
-        "k": 3 # value of k in k-EMA
+    default_settings = {
+        "sleep_duration": 15, # in seconds. THIS SETTING IS REQUIRED
+        "buy_limit": 3, # number of companies to buy at a time
+        "stocks_per_company":3, # how many stocks per company do you want to buy at a time
+        "holding_time": 5, # how many rounds to hold before you sell your stocks off
+        "no_of_companies": 10, # number of companies to buy from
+        "bot_tag": "unset", # special tags for searching purpose
+        "k": 3,
     }
 
     def __init__(self):
         self.settings = {}
-        self.settings = {**self.specific_settings, **self.settings}
+        self.settings = {**self.default_settings, **self.settings}
         self.current_time = 0 # how many instances have occured since last buying 
         self.company_list = [] # array of [company_id, ema , latest_price]
 
@@ -23,7 +29,7 @@ class EmaBot(BotBase):
             })
 
     async def update(self, *args, **kwargs):
-
+        print("This is the settings i'm going to run with",self.settings)
         if self.current_time == self.settings['holding_time']:
             # if you you held for long enough, sell what you bought and buy fresh
             self.current_time = 0
