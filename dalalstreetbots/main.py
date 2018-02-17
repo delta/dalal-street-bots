@@ -22,7 +22,6 @@ asyncio.ensure_future(market_messenger.start())
 
 # global variables for ass saving
 IS_INITIALIZED = False
-
 @app.route('/')
 async def hello():
     return 'hello'
@@ -39,6 +38,17 @@ async def pausetype():
     bot_type = data['bot_type']
     for bot in bots:
         if bot['type'] == bot_type:
+            await bot_manager.pause_bot(bot['id'])
+    return "bots paused"
+
+@app.route('/pausetags', methods=['POST'])
+async def pausetag():
+    bots = bot_manager.get_bots()
+    data = await request.form
+    required_tag = data['bot_tag']
+    for bot in bots:
+        bot_tag = bot['settings'].get('bot_tag')
+        if bot_tag == required_tag:
             await bot_manager.pause_bot(bot['id'])
     return "bots paused"
 
