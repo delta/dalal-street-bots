@@ -11,8 +11,8 @@ body {
 .lol{
   position: fixed;
   float: left;
-  left:4%;
-  width: 33% !important ;
+  left:2.5%;
+  width: 45% !important ;
   height: 90%;
   top:5%;
 }
@@ -57,7 +57,7 @@ body {
 .refresh-selection{
   position: absolute;
   top :90% !important;
-  left: 5%;
+  left: 2.5%;
   width:40px !important;
   height: 40px;
 }
@@ -68,35 +68,40 @@ body {
 }
 .name-search{
   float:right;
-  width:20%;
-  right:5%;
+  width:20% !important;
+  right:2.5% !important;
   top:5%;
   margin-top:2.5%;
 }
 .broken-paragraph{
   overflow: scroll;
-  width: 80% !important;
+  width: 100% !important;
+  height:15%;
   word-wrap: break-word !important;
 }
 .tag-search{
   float: right;
   width: 20%;
-  right:20%;
+  right:10%!important;
   margin-top:2.5%;
 }
 .botlist{
   float: right;
   margin-top :5% !important;
-  width :55%;
+  width :47.5%;
   height: 90% !important;
   right: 40%;
-  margin-right: 5%;
+  margin-right: 2.5%;
 }
 .horizontal-scorllable{
   overflow-y:auto !important; 
   white-space:pre-wrap !important;
 }
 
+.setting-textarea{
+  width: 100%;
+  resize: vertical;
+}
 .select-all{
   position: absolute;
   margin-top :5% !important;

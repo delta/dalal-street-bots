@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './index.css'
 import $ from 'jquery'
+import { BASE_URL } from './App'
 
 export class Panel extends React.Component {
     constructor(props) {
@@ -14,7 +15,7 @@ export class Panel extends React.Component {
         }
     }
     getLogs = (index) => {
-        var route = "http://192.168.100.5:9999/proxy/http://192.168.100.5:5000" + '/getlogs';
+        var route = BASE_URL + '/getlogs';
         var method = 'POST';
         console.log(index);
         console.log(this.props.setting)
@@ -35,17 +36,16 @@ export class Panel extends React.Component {
             let x = JSON.parse(data);
             let y = "";
             console.log(x)
-            Object.keys(x).forEach((val) => {
-                y += (x[val]) + " \n "
+            Object.keys(x).map((val) => {
+                y += x[val][2] + " : " + x[val][1] + "\n"
             })
-            console.log(y)
             this.setState({
                 logs: y
             });
         });
     }
     pause = () => {
-        var route = "http://192.168.100.5:9999/proxy/http://192.168.100.5:5000" + '/pausebot';
+        var route = BASE_URL + '/pausebot';
         var method = 'POST';
         console.log(this.props.setting)
         var botId = this.props.allSettings[this.props.selectedIndex]['id']
@@ -64,7 +64,7 @@ export class Panel extends React.Component {
         });
     }
     unpause = () => {
-        var route = "http://192.168.100.5:9999/proxy/http://192.168.100.5:5000" + '/unpausebot';
+        var route = BASE_URL + '/unpausebot';
         var method = 'POST';
         console.log(this.props.setting)
         var botId = this.props.allSettings[this.props.selectedIndex]['id']
@@ -83,7 +83,7 @@ export class Panel extends React.Component {
         });
     }
     unpauseMultiple = () => {
-        var route = "http://192.168.100.5:9999/proxy/http://192.168.100.5:5000" + '/unpausebot';
+        var route = BASE_URL + '/unpausebot';
         var method = 'POST';
         console.log(this.props.setting)
         Object.keys(this.props.selected).forEach((key) => {
@@ -106,7 +106,7 @@ export class Panel extends React.Component {
 
     }
     pauseMultiple = () => {
-        var route = "http://192.168.100.5:9999/proxy/http://192.168.100.5:5000" + '/pausebot';
+        var route = BASE_URL + '/pausebot';
         var method = 'POST';
         console.log(this.props.setting)
         Object.keys(this.props.selected).forEach((key) => {
@@ -136,12 +136,12 @@ export class Panel extends React.Component {
         } else {
             this.setState({
                 logs: "",
-                setting: JSON.stringify(props.setting),
+                setting: JSON.stringify(props.setting, null, 4),
             });
             return;
         }
         this.setState({
-            setting: JSON.stringify(props.setting),
+            setting: JSON.stringify(props.setting, null, 4),
         });
     }
     handleCountChange = (e) => {
@@ -162,37 +162,34 @@ export class Panel extends React.Component {
             })
     }
     handleTypeChange = (e) => {
-        if (this.props.type == 0)
-            this.setState({
-                type: e.target.value,
-            })
+        this.setState({
+            type: e.target.value,
+        })
     }
     render() {
         return (
             <div className="lol ui card">
-                <div className="ui input textarea" rows="5" columns="40">
-                    <textarea value={this.state.setting} onChange={this.handleSettingChange}></textarea>
+                <div className="ui form">
+                    <div className="field" rows="5" columns="40">
+                        <textarea className="setting-textarea" value={this.state.setting} onChange={this.handleSettingChange}></textarea>
+                    </div>
                 </div>
-                {this.state == 0 && <div className={"ui input"}>
-                    <input value={this.state.name} onChange={this.handleNameChange}>
+                {this.props.type == 0 && <div className="ui input">
+                    <input value={this.state.name} placeholder={"Bot Name(ignored for multiple bot creation)"} onChange={this.handleNameChange}>
                     </input>
                 </div>}
-                <div className={"ui input"}>
-                    <input value={this.state.type} onChange={this.handleTypeChange}>
+                <div className={"ui input"} >
+                    <input value={this.state.type} placeholder="Bot Type" onChange={this.handleTypeChange}>
                     </input>
                 </div>
-                <div className="ui input">
-                    <input value={this.state.count} onChange={this.handleCountChange}>
+                <div className="ui input" >
+                    <input value={this.state.count} placeholder="Count" onChange={this.handleCountChange}>
                     </input>
                 </div>
-                <div class="ui bottom attached segment pushable grid">
-                    <div class="pusher grid">
-                        <div class="ui main text container small">
-                            <pre className="broken-paragraph">{
-                                this.state.logs
-                            }</pre>
-                        </div>
-                    </div>
+                <div class="ui">
+                    <pre className="broken-paragraph">{
+                        this.state.logs
+                    }</pre>
                 </div>
                 {
                     this.props.type == 1 && <div className={"ui icon button add-bots " + this.props.hello} onClick={() => { this.props.modifyBot(this.state.setting) }}>

@@ -5,7 +5,7 @@ import { BotList } from './BotList';
 import * as $ from "jquery";
 
 window.jQuery = window.$ = $;
-
+export const BASE_URL = "http://192.168.100.5:9999/proxy/http://192.168.100.5:5000"
 var names = ["Delta", "Beta", "Gamma", "Tau", "Epsilon", "Theta", "Omega", "Alpha", "Eta", "Zeta"];
 
 export var IntegertoName = (id) => {
@@ -31,9 +31,10 @@ export default class App extends Component {
       type: 0,
       lastId: 0,
     }
+    this.refresh();
   }
   refresh = () => {
-    var route = "http://192.168.100.5:9999/proxy/http://192.168.100.5:5000" + '/getbotlist';
+    var route = BASE_URL + '/getbotlist';
     var method = 'POST';
     /*var username = $("#username").val();
     var password = $("#password").val();*/
@@ -78,7 +79,7 @@ export default class App extends Component {
   }
 
   addBot = (name, type, setting, count) => {
-    var route = "http://192.168.100.5:9999/proxy/http://192.168.100.5:5000" + '/createbot';
+    var route = BASE_URL + '/createbot';
     let lastId = this.state.lastId
     var method = 'POST';
     /*var username = $("#username").val();
@@ -115,7 +116,7 @@ export default class App extends Component {
         }
         var body = {
           //"admin_roll": username,
-          "bot_name": IntegertoName(lastId + i),
+          "bot_name": IntegertoName(lastId + i+1),
           "bot_type": type,
           "bot_settings": JSON.stringify(currentSettings),
           //"admin_pass": password
@@ -126,13 +127,18 @@ export default class App extends Component {
           data: body
         });
         console.log(body);
+        let usercount=0;
         request.done((data) => {
+          this.refresh();
         });
       }
     }
   }
   cancel = () => {
+    let selected = new Array(this.state.settings.length);
+      selected.fill(false, 0, this.state.settings.length - 1);
     this.setState({
+      selected:selected,
       type: 0,
       passedSettings: this.state.defaultsettings,
     })
@@ -161,7 +167,7 @@ export default class App extends Component {
   }
   render() {
     return <div className="app">
-      <Panel hello="blue"
+      <Panel hello="orange"
         modifyBot={this.modifyBot}
         add={this.addBot}
         refresh={this.refresh}

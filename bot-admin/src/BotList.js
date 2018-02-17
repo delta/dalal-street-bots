@@ -22,7 +22,7 @@ export class BotList extends React.Component {
     handleToggle = (number) => {
         let selected = this.state.selected.slice();
         selected[number] = !selected[number];
-        this.setState({ selected: selected });
+        this.props.selectAll(selected)
     }
     handleNameSearchChange = (e) => {
         this.setState({
@@ -56,13 +56,10 @@ export class BotList extends React.Component {
         return (
             <div>
                 <div className="ui input field name-search">
-                    <input className="ui input" value={this.state.nameFilter} onChange={this.handleNameSearchChange} />
+                    <input className="ui input" placeholder="Name"value={this.state.nameFilter} onChange={this.handleNameSearchChange} />
                 </div>
                 <div className="ui input field tag-search">
-                    <input className="ui input" value={this.state.tagFilter} onChange={this.handleTagSearchChange} />
-                </div>
-                <div className={"ui icon button select-all black"} onClick={this.selectAll}>
-                    <i className="check icon"></i>
+                    <input className="ui input" placeholder="Tag" value={this.state.tagFilter} onChange={this.handleTagSearchChange} />
                 </div>
                 <div className="botlist">
                     <table className="ui celled table">
@@ -71,7 +68,8 @@ export class BotList extends React.Component {
                                 <th>Id</th>
                                 <th>Name</th>
                                 <th>Type</th>
-                                <th></th>
+                                <th>Tag</th>
+                                <th onClick={this.selectAll}><i className="check icon"></i></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -87,15 +85,16 @@ export class BotList extends React.Component {
                                         return;
                                     if (x.indexOf(this.state.nameFilter) !== -1) {
                                         return (
-                                            <tr value={number} >
+                                            <tr value={number}  onClick={(i) => { this.handleClick(number) }}>
                                                 <td>{this.props.settings[number]['id']}</td>
                                                 <td>{this.props.settings[number]['name']}</td>
-                                                <td onClick={(i) => { this.handleClick(number) }}>{this.props.settings[number]['type']}</td >
+                                                <td>{this.props.settings[number]['type']}</td >
+                                                <td>{this.props.settings[number]['settings']['tag']}</td >
                                                 <td className="collapsing">
                                                     <div className="ui fitted checkbox">
                                                         <input type="checkbox"
                                                             checked={this.state.selected[number]}
-                                                            onClick={() => { this.handleToggle(number) }}
+                                                            onClick={(e) => { this.handleToggle(number);e.stopPropagation()}}
                                                         />
                                                         <label></label>
                                                     </div>
