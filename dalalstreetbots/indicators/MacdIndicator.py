@@ -1,12 +1,12 @@
 from indicators.IndicatorBase import IndicatorBase
 
-class MACDIndicator(IndicatorBase):
+class MacdIndicator(IndicatorBase):
 
     default_settings = {
         "type": "prices", # "prices" or "news". If news, it won't get prices updates
-        "macd_level": 4, # for signal line
-        "macd_newer": 6, # the less-lagging EMA value
-        "macd_lagger": 16
+        "macd_level": 1, # for signal line
+        "macd_newer": 2, # the less-lagging EMA value
+        "macd_lagger": 3
     }
 
     def __init__(self):
@@ -18,12 +18,12 @@ class MACDIndicator(IndicatorBase):
         self.prices.append(update)
         self.prices_length = self.prices_length + 1
 
-        if (self.prices_length < self.madc_lagger + self.settings['macd_level'] - 1):
+        if (self.prices_length < self.settings['macd_lagger'] + self.settings['macd_level'] - 1):
             # Do nothing if you are here. You don't have enough data
             pass
         
         else:
-            lagger_list = []
+            print("MacdIndicator reached here motherfuckerrrrr")
             macd_list = self.prices[-1*(self.settings['macd_lagger']+self.settings['macd_level']):]
             lagger_ema = self.k_ema(macd_list,self.settings['macd_lagger'])
             macd_list = self.prices[-1*(self.settings['macd_newer']+self.settings['macd_level']):]
@@ -36,7 +36,7 @@ class MACDIndicator(IndicatorBase):
             macd_list = self.k_ema(macd_list, self.settings['macd_level'])
             self.results["ema_9"] = macd_list[0]
     
-	def k_ema(self, series, k):
+    def k_ema(self, series, k):
             """Returns k-EMA series from input series array
             """
     

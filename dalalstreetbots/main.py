@@ -101,6 +101,41 @@ async def unpausetag():
         print(e)
         return e
 
+@app.route('/loadbot', methods=['POST'])
+async def loadbot():
+    try:
+        data = await request.form
+        bot_name = data['bot_name']
+        asyncio.ensure_future(bot_manager.load_bot(bot_name))
+        return "Loaded bot"
+    except Exception as e:
+        print(e)
+        return e
+
+@app.route('/pauseall', methods=['POST'])
+async def pauseall():
+    try:
+        data = await request.form
+        for bot_id in data:
+            bot_id = int(bot_id)
+            await bot_manager.pause_bot(bot_id)
+        return "Paused bots"
+    except Exception as e:
+        print(e)
+        return e
+
+@app.route('/unpauseall', methods=['POST'])
+async def unpauseall():
+    try:
+        data = await request.form
+        for bot_id in data:
+            bot_id = int(bot_id)
+            await bot_manager.unpause_bot(bot_id)
+        return "Unpaused bots"
+    except Exception as e:
+        print(e)
+        return e
+
 @app.route('/loadall', methods=['POST'])
 async def loadAll():
     try:
