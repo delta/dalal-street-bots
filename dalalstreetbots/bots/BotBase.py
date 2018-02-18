@@ -44,10 +44,10 @@ class BotBase(object):
             self.id, stock_id, stock_quantity, price, order_type
         )
 
-    async def place_sell_order(self, stock_id, stock_quantity, price):
+    async def place_sell_order(self, stock_id, stock_quantity, price, order_type):
         """place ask order"""
         return await self.__market_messenger.place_sell_order(
-            self.id, stock_id, stock_quantity, price
+            self.id, stock_id, stock_quantity, price, order_type
         )
 
     async def cancel_order(self, order_id, is_ask):
