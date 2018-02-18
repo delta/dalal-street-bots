@@ -11,7 +11,7 @@ class RsiBot(BotBase):
         "holding_time": 3, # how many rounds to hold before you sell your stocks off
         "no_of_companies": 10, # number of companies to buy from
         "bot_tag": "unset", # special tags for searching purpose
-        "k": 3,
+        "k": 5,
     }
 
     def __init__(self):

@@ -11,7 +11,7 @@ class EmaBot(BotBase):
         "holding_time": 5, # how many rounds to hold before you sell your stocks off
         "no_of_companies": 10, # number of companies to buy from
         "bot_tag": "unset", # special tags for searching purpose
-        "k": 3,
+        "k": 5,
     }
 
     def __init__(self):
@@ -36,11 +36,13 @@ class EmaBot(BotBase):
                 for my_company in self.company_list:
                     await self.place_sell_order(my_company[0], self.settings['stocks_per_company'], my_company[2])
                     log_message = "EmaBot(" + self.name + ") sold stocks of company" + str(my_company[0])
+                    print(log_message)
                     self.add_to_log(self.id, log_message)
             
             # else if it's time to sell but you haven't bought anything yet do nothing
             else:
                 log_message = "EmaBot(" + self.name + ") hasn't bought any companies yet"
+                print(log_message)
                 self.add_to_log(self.id, log_message)
 
             # after you have sold off all your previous stocks, first see which stocks are good
@@ -61,6 +63,7 @@ class EmaBot(BotBase):
                 # buy at market price
                 await self.place_buy_order(self.company_list[i][0], self.settings['stocks_per_company'], 0, 1)
                 log_message = "EmaBot(" + self.name + ") bought stock " + str(self.company_list[i])
+                print(log_message)
                 self.add_to_log(self.id, log_message)
                 i = i+1
 
@@ -70,6 +73,6 @@ class EmaBot(BotBase):
         else:
             # don't do anything
             log_message = "EmaBot(" + self.name + ") holding its stocks. Current time " + str(self.current_time)
+            print(log_message)
             self.add_to_log(self.id, log_message)
-
         self.current_time = self.current_time + 1

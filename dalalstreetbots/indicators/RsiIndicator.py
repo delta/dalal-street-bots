@@ -15,7 +15,7 @@ class RsiIndicator(IndicatorBase):
     def update(self, update):
         self.prices.append(update)
         self.prices_length = self.prices_length + 1
-
+        print("RSI INDICATOR ", self.settings['k'], self.prices_length)
         if (self.prices_length < self.settings['k']):
             # Do nothing if you are here. You don't have enough data
             pass
