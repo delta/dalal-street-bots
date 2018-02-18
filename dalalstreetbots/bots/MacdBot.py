@@ -42,7 +42,7 @@ class MacdBot(BotBase):
             # if you have bought some stocks already, sell them
             if len(self.company_list) != 0 :
                 for my_company in self.company_list:
-                    await self.place_sell_order(my_company[0], self.settings["stocks_per_company"], my_company[2])
+                    await self.place_sell_order(my_company[0], self.settings["stocks_per_company"], my_company[2], 0)
                     log_message = "MACDBot(" + self.name + ") sold stocks of company" + str(my_company[0])
                     self.add_to_log(self.id, log_message)
             # else, do nothing. Just log it
@@ -68,7 +68,7 @@ class MacdBot(BotBase):
             # buy new companies
             i = 0
             while i<length:
-                await self.buy_stocks_from_exchange(self.company_list[i][0], self.settings["stocks_per_company"])
+                await self.place_buy_order(self.company_list[i][0], self.settings["stocks_per_company"], 0, 1)
                 log_message = "MACDBot(" + self.name + ") bought stock " + str(self.company_list[i])
                 print(log_message)
                 self.add_to_log(self.id, log_message)

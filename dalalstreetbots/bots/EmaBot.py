@@ -34,7 +34,7 @@ class EmaBot(BotBase):
             self.current_time = 0
             if len(self.company_list) != 0 :
                 for my_company in self.company_list:
-                    await self.place_sell_order(my_company[0], self.settings['stocks_per_company'], my_company[2])
+                    await self.place_sell_order(my_company[0], self.settings['stocks_per_company'], my_company[2], 0)
                     log_message = "EmaBot(" + self.name + ") sold stocks of company" + str(my_company[0])
                     print(log_message)
                     self.add_to_log(self.id, log_message)

@@ -197,10 +197,10 @@ class MarketMessenger:
         req = PlaceOrderRequest(stock_id=stock_id, stock_quantity=stock_quantity, price=price, order_type=order_type)
         return await self.__call_action("PlaceOrder", req, bot_id, PlaceOrderResponse)
 
-    async def place_sell_order(self, bot_id, stock_id, stock_quantity, price):
+    async def place_sell_order(self, bot_id, stock_id, stock_quantity, price, order_type):
         """place ask order"""
 
-        req = PlaceOrderRequest(stock_id=stock_id, stock_quantity=stock_quantity, price=price, is_ask=True)
+        req = PlaceOrderRequest(stock_id=stock_id, stock_quantity=stock_quantity, price=price, order_type=order_type, is_ask=True)
         return await self.__call_action("PlaceOrder", req, bot_id, PlaceOrderResponse)
 
     async def cancel_order(self, bot_id, order_id, is_ask):
