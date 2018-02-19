@@ -5,13 +5,13 @@ class EmaBot(BotBase):
     If you lose to this bot, then you should reconsider a future in the market."""
 
     default_settings = {
-        "sleep_duration": 15, # in seconds. THIS SETTING IS REQUIRED
+        "sleep_duration": 5, # in seconds. THIS SETTING IS REQUIRED
         "buy_limit": 3, # number of companies to buy at a time
         "stocks_per_company":3, # how many stocks per company do you want to buy at a time
         "holding_time": 5, # how many rounds to hold before you sell your stocks off
         "no_of_companies": 10, # number of companies to buy from
         "bot_tag": "unset", # special tags for searching purpose
-        "k": 5,
+        "k": 5
     }
 
     def __init__(self):
@@ -34,8 +34,9 @@ class EmaBot(BotBase):
             self.current_time = 0
             if len(self.company_list) != 0 :
                 for my_company in self.company_list:
-                    await self.place_sell_order(my_company[0], self.settings['stocks_per_company'], my_company[2], 0)
-                    log_message = "EmaBot(" + self.name + ") sold stocks of company" + str(my_company[0])
+                    avgprice = self.emaindicator[my_company[0]].results.get('avgprice')
+                    await self.place_sell_order(my_company[0], self.settings['stocks_per_company'], avgprice, 0)
+                    log_message = "EmaBot(" + self.name + ") sold stocks of company " + str(my_company[0]) + " at price " + str(avgprice)
                     print(log_message)
                     self.add_to_log(self.id, log_message)
             

@@ -169,8 +169,9 @@ class MarketMessenger:
         try:
             res = await method(req, metadata=self.__getmd_for_bot(bot_id))
             if res.status_code != response_class.OK:
+                print("Fucked up right over here ", res)
                 raise Exception("Got non OK response code: " + str(res.status_code))
-            #print("Got response ", res)
+
         except grpc.RpcError as error:
             status_code = error.code()
             print("Got error while calling " + method_name, type(error), error.details(), status_code.name)

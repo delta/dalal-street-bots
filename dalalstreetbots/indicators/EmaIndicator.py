@@ -1,5 +1,5 @@
 from indicators.IndicatorBase import IndicatorBase
-
+from math import ceil
 class EmaIndicator(IndicatorBase):
 
     default_settings = {
@@ -26,9 +26,11 @@ class EmaIndicator(IndicatorBase):
             # The first time, it's just the average
             self.ema_history.append(sum(self.prices[:])/self.settings['k'])
             self.results['ema_ratio'] = (self.ema_history[-1])/update
+            self.results['avgprice']  = ceil(sum(self.prices[-1*self.settings['k']:])/self.settings['k'])
 
         else:
             # Next time onwards, it's using the formula for ema
             next_ema = (update - self.ema_history[-1])*2/(self.settings['k']+1) + self.ema_history[-1]
             self.ema_history.append(next_ema)
             self.results['ema_ratio'] = (next_ema)/update
+            self.results['avgprice']  = ceil(sum(self.prices[-1*self.settings['k']:])/self.settings['k'])

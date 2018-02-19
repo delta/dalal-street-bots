@@ -9,3 +9,4 @@ protobuf==3.5.1
 pylint==1.8.1
 six==1.11.0
 wrapt==1.10.11
+Quart==0.4.1
