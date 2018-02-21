@@ -210,13 +210,13 @@ class MarketMessenger:
         req = CancelOrderRequest(order_id=order_id, is_ask=is_ask)
         return await self.__call_action("CancelOrder", req, bot_id, CancelOrderResponse)
 
-## Master control's mother
-#def main():
-#    market_messenger = MarketMessenger()
-#    loop = asyncio.get_event_loop()
-#    loop.run_until_complete(market_messenger.run())
-#    loop.close()
-#
-## Master control's grandmother
-#if __name__ == "__main__":
-#    main()
+# Master control's mother
+def main():
+    market_messenger = MarketMessenger()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(market_messenger.start())
+    loop.close()
+
+# Master control's grandmother
+if __name__ == "__main__":
+    main()

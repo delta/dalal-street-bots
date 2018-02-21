@@ -16,9 +16,9 @@ loop = asyncio.get_event_loop()
 
 # load utilities
 market_messenger = MarketMessenger(loop)
+asyncio.ensure_future(market_messenger.start())
 indicator_manager = IndicatorManager(market_messenger)
 bot_manager = BotManager(market_messenger, indicator_manager, loop)
-asyncio.ensure_future(market_messenger.start())
 
 # global variables for ass saving
 IS_INITIALIZED = False
@@ -233,4 +233,6 @@ async def get_logs():
         return e
 
 if __name__ == "__main__":
+    IS_INITIALIZED = True
+    #asyncio.ensure_future(bot_manager.load_all_bots())
     app.run(host='0.0.0.0', port=5000)
