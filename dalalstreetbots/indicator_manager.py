@@ -17,19 +17,37 @@ class IndicatorManager:
         self.indicator_count = 0
         self.__indicators__ = dict()
         asyncio.ensure_future(self.start_stock_prices_stream())
+        asyncio.ensure_future(self.start_market_depth_stream())
 
     async def start_stock_prices_stream(self):
-        stream = await self.market_messenger.get_stock_prices_stream()
+        while True:
+            try:
+                stream = await self.market_messenger.get_stock_prices_stream()
 
-        try:
-            async for update in stream:
-                for stock_id in update.prices:
+                async for update in stream:
+                    for stock_id in update.prices:
+                        for indic_type in self.__indicators__:
+                            for settings_hash in self.__indicators__[indic_type][stock_id]:
+                                if "update_type" not in settings_hash or settings_hash["update_type"] == "price":
+                                    indicator = self.__indicators__[indic_type][stock_id][settings_hash]
+                                    indicator.update(update.prices[stock_id])
+            except Exception as e:
+                print("Unexpected error happened in stock prices stream: ", e)
+
+    async def start_market_depth_stream(self):
+        while True:
+            try:
+                stream = await self.market_messenger.get_market_depth_stream()
+
+                async for update in stream:
+                    stock_id = update.stock_id:
                     for indic_type in self.__indicators__:
                         for settings_hash in self.__indicators__[indic_type][stock_id]:
-                            indicator = self.__indicators__[indic_type][stock_id][settings_hash]
-                            indicator.update(update.prices[stock_id])
-        except Exception as e:
-            print("Unexpected error happened: ", e)
+                            if "update_type" in settings_hash and settings_hash["update_type"] == "market_depth":
+                                indicator = self.__indicators__[indic_type][stock_id][settings_hash]
+                                indicator.update(update)
+            except Exception as e:
+                print("Unexpected error happened in market depth stream: ", e)
 
     def get_indicator_types(self):
         """get_indicator_types returns a list of names of indicator classes found in the

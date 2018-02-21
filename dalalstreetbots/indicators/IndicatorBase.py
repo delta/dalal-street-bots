@@ -4,7 +4,7 @@ class IndicatorBase(object):
     """IndicatorBase class defines the base class for all indicators"""
 
     default_settings = {
-        "type": "prices" # "prices" or "news". If news, it won't get prices updates
+        "update_type": "prices" # "prices" or "news" or "market_depth". Only one update will be given
     }
 
     async def _hidden_init_(self, id, settings, manager):
