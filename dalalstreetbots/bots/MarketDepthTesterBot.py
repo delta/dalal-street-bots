@@ -10,6 +10,8 @@ class MarketDepthTesterBot(BotBase):
     }
 
     def __init__(self):
+        self.settings = {}
+        self.settings = {**self.default_settings, **self.settings}
         self.__bought = False
 
     async def load_indicators(self):
@@ -17,4 +19,6 @@ class MarketDepthTesterBot(BotBase):
 
     async def update(self, *args, **kwargs):
         """update method MUST BE OVERRIDDEN by *all* bots inheriting BotBase"""
+        print(self.indicator.max_buy, self.indicator.min_sell, self.indicator.max_buy_is_market_order, self.indicator.min_sell_is_market_order)
+        print(self.indicator.ask_depth, self.indicator.bid_depth)
         pass

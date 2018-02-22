@@ -13,7 +13,7 @@ class StockchangerBot(BotBase):
         "no_of_companies": 1, # number of companies to buy from
         "bot_tag": "unset", # special tags for searching purpose
         "impact": 0,
-        "stockId":0,
+        "stockId":1,
     }
 
     def __init__(self):
@@ -24,6 +24,12 @@ class StockchangerBot(BotBase):
 
     async def load_indicators(self):
         self.stockchangerindicator = {}
+        self.marketdepthindicator = {}
+        for i in range(1, self.settings["no_of_companies"]+1):
+            self.marketdepthindicator[i] = await self.get_indicator("MarketDepthIndicator", i, {
+                "type": "prices",
+            })
+        
         for i in range(1, self.settings["no_of_companies"]+1):
             self.stockchangerindicator[i] = await self.get_indicator("StockchangerIndicator", i, {
                 "type": "prices",

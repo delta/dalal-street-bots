@@ -17,7 +17,7 @@ class IndicatorManager:
         self.indicator_count = 0
         self.__indicators__ = dict()
         asyncio.ensure_future(self.start_stock_prices_stream())
-        asyncio.ensure_future(self.start_market_depth_streams())
+        #asyncio.ensure_future(self.start_market_depth_streams())
 
     async def start_stock_prices_stream(self):
         while True:
@@ -28,11 +28,15 @@ class IndicatorManager:
                     for stock_id in update.prices:
                         for indic_type in self.__indicators__:
                             for settings_hash in self.__indicators__[indic_type][stock_id]:
-                                if "update_type" not in settings_hash or settings_hash["update_type"] == "price":
-                                    indicator = self.__indicators__[indic_type][stock_id][settings_hash]
+                                indicator = self.__indicators__[indic_type][stock_id][settings_hash]
+                                if indicator.update_type == "prices":
                                     indicator.update(update.prices[stock_id])
+                        
             except Exception as e:
                 print("Unexpected error happened in stock prices stream: ", e)
+                raise e
+            
+            await asyncio.sleep(2)
 
     async def start_market_depth_streams(self):
         await asyncio.sleep(3)
@@ -45,15 +49,23 @@ class IndicatorManager:
         while True:
             try:
                 stream = await self.market_messenger.get_market_depth_stream(stock_id)
+                first_update = None
 
                 async for update in stream:
+                    if first_update is None:
+                        first_update = update
+                    
                     for indic_type in self.__indicators__:
-                        for settings_hash in self.__indicators__[indic_type][stock_id]:
-                            if "update_type" in settings_hash and settings_hash["update_type"] == "market_depth":
+                        if stock_id in self.__indicators__[indic_type]:
+                            for settings_hash in self.__indicators__[indic_type][stock_id]:
                                 indicator = self.__indicators__[indic_type][stock_id][settings_hash]
-                                indicator.update(update)
+                                if indicator.update_type == "market_depth":
+                                    indicator.update(first_update, update)
+
             except Exception as e:
-                print("Unexpected error happened in market depth stream: ", e)
+                print("Unexpected error happened in market depth stream of stockid: ", stock_id, e)
+                raise e
+                await asyncio.sleep(2)
 
     def get_indicator_types(self):
         """get_indicator_types returns a list of names of indicator classes found in the
@@ -68,6 +80,7 @@ class IndicatorManager:
             indicator_module = getattr(indicator_module, indicator_class_name)
             indicator_class = getattr(indicator_module, indicator_class_name)
             indicator_settings = getattr(indicator_class, "default_settings", {})
+            indicator_update_type = getattr(indicator_class, "update_type") # should fail if update_type isn't defined
             return indicator_settings
         except Exception as error:
             print(error)
@@ -113,6 +126,12 @@ class IndicatorManager:
             indicator = indicator_class()
             await indicator._hidden_init_(self.indicator_count, indicator_settings, self)
             indicators[indicator_settings_hash] = indicator
+
+            if indicator.update_type == "market_depth":
+                asyncio.ensure_future(self.start_market_depth_stream(stock_id))
+            #elif indicator.update_type == "prices":
+            #    indicator.update(self.market_messenger.stocks[stock_id].current_price)
+
 
         indicator = indicators[indicator_settings_hash]
 

@@ -3,8 +3,9 @@ from indicators.IndicatorBase import IndicatorBase
 class PricechangerIndicator(IndicatorBase):
 
     default_settings = {
-        "type": "prices" # "prices" or "news". If news, it won't get prices updates
     }
+
+    update_type = "prices"
 
     def __init__(self):
         self.price = 0

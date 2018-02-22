@@ -3,9 +3,10 @@ from math import ceil
 class EmaIndicator(IndicatorBase):
 
     default_settings = {
-        "type": "prices", # "prices" or "news". If news, it won't get prices updates
         "k": 3  # value of k in k-EMA
     }
+
+    update_type = "prices"
 
     def __init__(self):
         self.prices = []

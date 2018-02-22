@@ -234,5 +234,5 @@ async def get_logs():
 
 if __name__ == "__main__":
     IS_INITIALIZED = True
-    #asyncio.ensure_future(bot_manager.load_all_bots())
+    asyncio.ensure_future(bot_manager.load_all_bots())
     app.run(host='0.0.0.0', port=5000)

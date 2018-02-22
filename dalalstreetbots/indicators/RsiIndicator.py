@@ -3,10 +3,11 @@ from indicators.IndicatorBase import IndicatorBase
 class RsiIndicator(IndicatorBase):
 
     default_settings = {
-        "type": "prices", # "prices" or "news". If news, it won't get prices updates
         "k": 3,
     }
 
+    update_type = "prices"
+    
     def __init__(self):
         self.prices = []
         self.prices_length = 0

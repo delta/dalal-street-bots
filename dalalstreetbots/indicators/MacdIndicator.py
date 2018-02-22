@@ -3,11 +3,12 @@ from indicators.IndicatorBase import IndicatorBase
 class MacdIndicator(IndicatorBase):
 
     default_settings = {
-        "type": "prices", # "prices" or "news". If news, it won't get prices updates
         "macd_level": 1, # for signal line
         "macd_newer": 2, # the less-lagging EMA value
         "macd_lagger": 3
     }
+
+    update_type = "prices"
 
     def __init__(self):
         self.prices = []

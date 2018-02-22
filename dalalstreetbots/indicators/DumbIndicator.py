@@ -6,8 +6,9 @@ class DumbIndicator(IndicatorBase):
     """DumbIndicator class defines a dumb indicators"""
 
     default_settings = {
-        "type": "prices" # "prices" or "news". If news, it won't get prices updates
     }
+
+    update_type = "prices"
 
     def update(self, update):
         print("My update got called!", update)
