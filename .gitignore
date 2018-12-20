@@ -2,3 +2,4 @@ venv/*
 dalalstreetbots/proto_build/*
 .vscode/*
 *.pyc
+dalalstreetbots/dalalstreetbots.db

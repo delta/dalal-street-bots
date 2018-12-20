@@ -13,5 +13,4 @@ class StockchangerIndicator(IndicatorBase):
 
     def update(self, update):
         # just store the last price and buy more and more eventually
-        print("Got price update ",update)
         self.price = update

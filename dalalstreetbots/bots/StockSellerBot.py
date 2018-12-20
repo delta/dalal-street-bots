@@ -55,23 +55,34 @@ class StockSellerBot(BotBase):
 
             try:
                 if depth.max_buy_is_market_order:
-                    print("buy market there. placing sell market")
                     await self.place_sell_order(i, self.settings['stocks_per_company'], 0, 1)
+                    log_message = "StockSeller({}) placed sell order for company {}".format(self.name, i)
+                    print(log_message)
+                    self.add_to_log(self.id, log_message)       
                 
                 elif depth.min_sell == 1e9:
                     sell_price = floor(1.15*current_price)
-                    print("no sell orders. placing one at ", sell_price)
                     await self.place_sell_order(i, self.settings['stocks_per_company'], sell_price, 0)
+                    log_message = "StockSeller({}) placed sell order for company {} at price {}".format(
+                        self.name,
+                        i,
+                        sell_price
+                    )
+                    print(log_message)
+                    self.add_to_log(self.id, log_message)
 
                 elif depth.min_sell - depth.max_buy >= 10:
                     sell_price = min((1.15*current_price, depth.min_sell - (depth.min_sell - depth.max_buy)/15))
                     sell_price = floor(sell_price)
-                    print("reducing gap from: {} to {}".format(depth.min_sell-depth.max_buy, sell_price))                
                     await self.place_sell_order(i, self.settings['stocks_per_company'], sell_price, 0)
+                    log_message = "StockSeller({}) placed sell order for company {} at price {}".format(
+                        self.name,
+                        i,
+                        sell_price
+                    )
+                    print(log_message)
+                    self.add_to_log(self.id, log_message)
             except Exception as e:
-                import traceback
-                print("Stock seller bot failed while placing order")
-                traceback.print_exc()
-
-            # nothing to do
-            return
+            log_message = "StockSeller({}) just broke. Cause: {}".format(self.name, str(e))
+            print(log_message)
+            self.add_to_log(self.id, log_message)

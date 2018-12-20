@@ -29,6 +29,7 @@ class EmaBot(BotBase):
             })
 
     async def update(self, *args, **kwargs):
+        try:
         if self.current_time == self.settings['holding_time']:
             # if you you held for long enough, sell what you bought and buy fresh
             self.current_time = 0
@@ -36,16 +37,12 @@ class EmaBot(BotBase):
                 for my_company in self.company_list:
                     avgprice = self.emaindicator[my_company[0]].results.get('avgprice')
                     await self.place_sell_order(my_company[0], self.settings['stocks_per_company'], avgprice, 0)
-                    log_message = "EmaBot(" + self.name + ") sold stocks of company " + str(my_company[0]) + " at price " + str(avgprice)
-                    print(log_message)
+                    log_message = "EmaBot({}) sold stocks of company {} at price {}".format(self.name, str(my_company[0]) ,str(avgprice))
                     self.add_to_log(self.id, log_message)
             
             # else if it's time to sell but you haven't bought anything yet do nothing
             else:
-                log_message = "EmaBot(" + self.name + ") hasn't bought any companies yet"
-                print(log_message)
-                self.add_to_log(self.id, log_message)
-
+                pass
             # after you have sold off all your previous stocks, first see which stocks are good
             self.company_list = []
 
@@ -63,7 +60,7 @@ class EmaBot(BotBase):
             while i<length:
                 # buy at market price
                 await self.place_buy_order(self.company_list[i][0], self.settings['stocks_per_company'], 0, 1)
-                log_message = "EmaBot(" + self.name + ") bought stock " + str(self.company_list[i])
+                log_message = "EmaBot({}) bought stock {}".format(self.name, str(self.company_list[i]))
                 print(log_message)
                 self.add_to_log(self.id, log_message)
                 i = i+1
@@ -71,9 +68,9 @@ class EmaBot(BotBase):
             # modify company_list to contain only the ones we bought
             self.company_list = self.company_list[:length]
 
-        else:
-            # don't do anything
-            log_message = "EmaBot(" + self.name + ") holding its stocks. Current time " + str(self.current_time)
+            self.current_time = self.current_time + 1
+        
+        except Exception as e:
+            log_message = "EmaBot({}) just broke. Cause: {}".format(self.name, str(e))
             print(log_message)
             self.add_to_log(self.id, log_message)
-        self.current_time = self.current_time + 1

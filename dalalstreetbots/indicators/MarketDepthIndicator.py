@@ -9,7 +9,6 @@ class MarketDepthIndicator(IndicatorBase):
     update_type = "market_depth"
 
     def __init__(self):
-        print("inited")
         # private, not required outside
         self.__first_update_done = False
         
@@ -22,7 +21,6 @@ class MarketDepthIndicator(IndicatorBase):
         self.ismarket = True
 
     def update(self, first_update, update):
-        print("Got market update")
         if not self.__first_update_done:
             self.__first_update_done = True
 

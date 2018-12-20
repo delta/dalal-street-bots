@@ -33,19 +33,22 @@ class StockBuyerBot(BotBase):
             })
 
     async def update(self, *args, **kwargs):
-        for i in range(1, self.settings['no_of_companies'] + 1):
-            min_sell = self.depthindicator[i].min_sell
-            max_buy    = self.depthindicator[i].max_buy
-            difference = min_sell - max_buy
+        try:
+            for i in range(1, self.settings['no_of_companies'] + 1):
+                min_sell = self.depthindicator[i].min_sell
+                max_buy    = self.depthindicator[i].max_buy
+                difference = min_sell - max_buy
 
-            if min_sell == 1e9:
-                buy_price = ceil(0.97*max_buy)
-            
-            elif difference >= 10:
-                buy_price = ceil(difference*0.1 + max_buy)
+                if min_sell == 1e9:
+                    buy_price = ceil(0.97*max_buy)
+                elif difference >= 10:
+                    buy_price = ceil(difference*0.1 + max_buy)
 
-            print("gonna buy this nigger at this price ",buy_price)
-            await self.place_buy_order(i, self.settings['stocks_per_company'], buy_price, 0)
-            log_message = "StockBuyerBot(" + self.name + ") placed an order for company " + str(i) + " at price " + str(buy_price)
+                await self.place_buy_order(i, self.settings['stocks_per_company'], buy_price, 0)
+                log_message = "StockBuyerBot({}) placed a buy order for company {} at price {}".format(self.name, str(i), str(buy_price))
+                print(log_message)
+                self.add_to_log(self.id, log_message)
+        except Exception as e:
+            log_message = "StockBuyer({}) just broke. Cause: {}".format(self.name, str(e))
             print(log_message)
             self.add_to_log(self.id, log_message)

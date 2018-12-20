@@ -36,12 +36,28 @@ class StockchangerBot(BotBase):
             })
 
     async def update(self, *args, **kwargs):
-        correct_indicator = self.stockchangerindicator[self.settings['stockId']]
-        stock_price = correct_indicator.price
-        if (stock_price != 0):
-            stock_price = math.floor(stock_price + stock_price*self.settings['impact'])
-            if self.settings['impact'] > 0:
-                await self.place_buy_order(self.settings['stockId'], self.settings['stocks_per_company'], stock_price, 0)
-            if self.settings['impact'] < 0:
-                await self.place_sell_order(self.settings['stockId'], self.settings['stocks_per_company'], stock_price, 0)
-            print(self.name + " just ran now")
+        try:
+            correct_indicator = self.stockchangerindicator[self.settings['stockId']]
+            stock_price = correct_indicator.price
+            if (stock_price != 0):
+                stock_price = math.floor(stock_price + stock_price*self.settings['impact'])
+                if self.settings['impact'] > 0:
+                    await self.place_buy_order(self.settings['stockId'], self.settings['stocks_per_company'], stock_price, 0)
+                    log_message = "StockChanger({}) placed a buy order for company {} at price {}".format(
+                        self.name,
+                        self.settings['stockId'],
+                        stock_price
+                    )
+                    print(log_message)
+                    self.add_to_log(self.id, log_message)
+                if self.settings['impact'] < 0:
+                    await self.place_sell_order(self.settings['stockId'], self.settings['stocks_per_company'], stock_price, 0)
+                    log_message = "StockChanger({}) placed a sell order for company {} at price {}".format(
+                        self.name,
+                        self.settings['stockId'],
+                        stock_price
+                    )
+        except Exception as e:
+            log_message = "StockChanger({}) just broke. Cause: {}".format(self.name, str(e))
+            print(log_message)
+            self.add_to_log(self.id, log_message)

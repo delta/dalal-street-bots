@@ -31,18 +31,29 @@ class OverBoughtOverSoldBot(BotBase):
 
     async def update(self, *args, **kwargs):
         """update method MUST BE OVERRIDDEN by *all* bots inheriting BotBase"""
+        try:
+            for stock_id in range(1, self.settings["no_of_companies"]):
+                percentage_change = sum(self.pricechangeindicator[i].prices)
+                if percentage_change > self.settings['percentage_change']:
+                    cut_down_percent = abs(percentage_change / self.settings['cut_down_factor'])
+                    sell_price = self.pricechangeindicator[i].current_price * ((100 - cut_down_percent) / 100)
+                    await self.place_sell_order(my_company[0], self.settings["stocks_per_company"], sell_price, 0)
 
-        for stock_id in range(1, self.settings["no_of_companies"]):
-            percentage_change = sum(self.pricechangeindicator[i].prices)
-            if percentage_change > self.settings['percentage_change']:
-                cut_down_percent = abs(percentage_change / self.settings['cut_down_factor'])
-                sell_price = self.pricechangeindicator[i].current_price * ((100 - cut_down_percent) / 100)
-                await self.place_sell_order(my_company[0], self.settings["stocks_per_company"], sell_price, 0)
-            elif percentage_change < self.settings['percentage_change']*-1:
-                # if percentage_change is too rapid, place buy orders at slightly higher price
-                cut_down_percent = abs(percentage_change/self.settings['cut_down_factor'])
-                buy_price = self.pricechangeindicator[i].current_price * ((100 + cut_down_percent) / 100)
-                await self.place_buy_order(self.company_list[i][0], self.settings["stocks_per_company"], buy_price, 1)
-            else:
-                # if change has been moderate, do nothing
-                pass
+                    log_message = "OverBoughtOverSold({}) sold stock {}".format(self.name, str(self.company_list[i][0]))
+                    print(log_message)
+                    self.add_to_log(self.id, log_message)
+                elif percentage_change < self.settings['percentage_change']*-1:
+                    # if percentage_change is too rapid, place buy orders at slightly higher price
+                    cut_down_percent = abs(percentage_change/self.settings['cut_down_factor'])
+                    buy_price = self.pricechangeindicator[i].current_price * ((100 + cut_down_percent) / 100)
+                    await self.place_buy_order(self.company_list[i][0], self.settings["stocks_per_company"], buy_price, 1)
+                    
+                    log_message = "OverBoughtOverSold({}) bought stock {}".format(self.name, str(self.company_list[i][0]))
+                    print(log_message)
+                    self.add_to_log(self.id, log_message)
+
+        except Exception as e:
+            log_message = "OverBoughtOverSold({}) just broke. Cause: {}".format(self.name, str(e))
+            print(log_message)
+            self.add_to_log(self.id, log_message)
+        
