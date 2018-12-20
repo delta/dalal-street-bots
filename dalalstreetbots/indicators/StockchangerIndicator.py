@@ -3,6 +3,7 @@ from indicators.IndicatorBase import IndicatorBase
 class StockchangerIndicator(IndicatorBase):
 
     default_settings = {
+        "lookup_window": 5 # sum of how many days to check with percentage_change
     }
 
     update_type = "prices"

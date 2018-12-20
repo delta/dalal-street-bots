@@ -9,8 +9,11 @@ from google.protobuf.json_format import MessageToJson
 
 import json
 from quart import Quart, request
+from quart_cors import cors
 
 app = Quart(__name__)
+app = cors(app)
+QUART_CORS_ALLOW_ORIGIN	= ['*']
 
 loop = asyncio.get_event_loop()
 

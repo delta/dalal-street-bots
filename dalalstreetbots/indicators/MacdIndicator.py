@@ -24,7 +24,6 @@ class MacdIndicator(IndicatorBase):
             pass
         
         else:
-            print("MacdIndicator reached here motherfuckerrrrr")
             macd_list = self.prices[-1*(self.settings['macd_lagger']+self.settings['macd_level']):]
             lagger_ema = self.k_ema(macd_list,self.settings['macd_lagger'])
             macd_list = self.prices[-1*(self.settings['macd_newer']+self.settings['macd_level']):]

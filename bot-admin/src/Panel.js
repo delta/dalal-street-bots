@@ -186,7 +186,7 @@ export class Panel extends React.Component {
                     <input value={this.state.count} placeholder="Count" onChange={this.handleCountChange}>
                     </input>
                 </div>
-                <div class="ui">
+                <div className="ui">
                     <pre className="broken-paragraph">{
                         this.state.logs
                     }</pre>

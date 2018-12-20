@@ -5,7 +5,7 @@ import { BotList } from './BotList';
 import * as $ from "jquery";
 
 window.jQuery = window.$ = $;
-export const BASE_URL = "http://192.168.100.5:9999/proxy/http://192.168.100.5:5000"
+export const BASE_URL = "http://0.0.0.0:5000"
 var names = ["Delta", "Beta", "Gamma", "Tau", "Epsilon", "Theta", "Omega", "Alpha", "Eta", "Zeta"];
 
 export var IntegertoName = (id) => {

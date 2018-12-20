@@ -34,7 +34,7 @@ class MarketMessenger:
         cert = open('grpc-server.crt').read().encode("utf8")
         creds = grpc.ssl_channel_credentials(cert)
         channel = grpc.secure_channel(
-            "139.59.47.250:443",
+            "localhost:8000",
             creds,
             options=(('grpc.ssl_target_name_override', "localhost",),))
 
