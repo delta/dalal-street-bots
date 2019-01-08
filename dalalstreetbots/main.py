@@ -29,7 +29,7 @@ IS_INITIALIZED = False
 async def hello():
     return 'hello'
 
-@app.route('/getbotlist', methods=['POST'])
+@app.route('/getbotlist', methods=['GET'])
 async def getbotlist():
     try:
         return_data = bot_manager.get_bots()

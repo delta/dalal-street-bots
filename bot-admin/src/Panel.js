@@ -3,6 +3,75 @@ import './index.css'
 import $ from 'jquery'
 import { BASE_URL } from './App'
 
+var bot_types = {
+    'MacdBot': {
+        "sleep_duration": 15, // in seconds. THIS SETTING IS REQUIRED
+        "buy_limit": 3, // number of companies to buy at a time
+        "stocks_per_company":3, // how many stocks per company do you want to buy at a time
+        "holding_time": 3, // how many rounds to hold before you sell your stocks off
+        "no_of_companies": 10, // number of companies to buy from
+        "bot_tag": "unset", // special tags for searching purpose
+        "macd_level": 3, // for signal line
+        "macd_newer": 5, // the less-lagging EMA value
+        "macd_lagger": 7, // the more - lagging EMA value
+    },
+    'DumbBot': {
+        "sleep_duration": 15, // in seconds. THIS SETTING IS REQUIRED
+    },
+    'OverBoughtOverSold': {
+        "sleep_duration": 15, // in seconds. THIS SETTING IS REQUIRED
+        "no_of_companies": 10, // number of companies to buy from. Technically should be ALL
+        "bot_tag": "unset", // special tags for searching purpose
+        "percentage_change": 10, // the sum percentage change before the bot starts acting
+        "cut_down_factor": 2, // how much to cut down the current percentage of increase by
+    },
+    'StockBuyerBot': {
+        "sleep_duration": 3, // in seconds. THIS SETTING IS REQUIRED
+        "buy_limit": 3, // number of companies to buy at a time
+        "stocks_per_company":3, // how many stocks per company do you want to buy at a time
+        "holding_time": 5, // how many rounds to hold before you sell your stocks off
+        "no_of_companies": 12, // number of companies to buy from
+        "bot_tag": "unset", // special tags for searching purpose
+    },
+    'StockSellerBot': {
+        "sleep_duration": 5, // in seconds. THIS SETTING IS REQUIRED
+        "buy_limit": 3, // number of companies to buy at a time
+        "stocks_per_company":3, // how many stocks per company do you want to buy at a time
+        "holding_time": 5, // how many rounds to hold before you sell your stocks off
+        "no_of_companies": 12, // number of companies to buy from
+        "bot_tag": "unset", // special tags for searching purpose
+    },
+    'StockchangerBot': {
+        "sleep_duration": 15, // in seconds. THIS SETTING IS REQUIRED
+        "buy_limit": 3, // number of companies to buy at a time
+        "stocks_per_company":1, // how many stocks per company do you want to buy at a time
+        "holding_time": 5, // how many rounds to hold before you sell your stocks off
+        "no_of_companies": 1, // number of companies to buy from
+        "bot_tag": "unset", // special tags for searching purpose
+        "impact": 0,
+        "stockId":1,
+    },
+    'EmaBot': {
+        "sleep_duration": 5, // in seconds. THIS SETTING IS REQUIRED
+        "buy_limit": 3, // number of companies to buy at a time
+        "stocks_per_company":3, // how many stocks per company do you want to buy at a time
+        "holding_time": 5, // how many rounds to hold before you sell your stocks off
+        "no_of_companies": 10, // number of companies to buy from
+        "bot_tag": "unset", // special tags for searching purpose
+        "k": 5
+    },
+    'RsiBot': {
+        "sleep_duration": 15, // in seconds. THIS SETTING IS REQUIRED
+        "buy_limit": 3, // number of companies to buy at a time
+        "stocks_per_company":3, // how many stocks per company do you want to buy at a time
+        "holding_time": 3, // how many rounds to hold before you sell your stocks off
+        "no_of_companies": 10, // number of companies to buy from
+        "bot_tag": "unset", // special tags for searching purpose
+        "k": 5,
+    }
+};
+
+
 export class Panel extends React.Component {
     constructor(props) {
         super(props);
@@ -164,14 +233,18 @@ export class Panel extends React.Component {
     handleTypeChange = (e) => {
         this.setState({
             type: e.target.value,
+            setting: JSON.stringify(bot_types[e.target.value], null, 4),
         })
     }
     render() {
+        var options = Object.keys(bot_types).map(function(bot_type) {
+            return <option value={bot_type}>{bot_type}</option>;
+        });
         return (
             <div className="lol ui card">
                 <div className="ui form">
                     <div className="field" rows="5" columns="40">
-                        <textarea className="setting-textarea" value={this.state.setting} onChange={this.handleSettingChange}></textarea>
+                        <textarea id="settingsText" className="setting-textarea" value={this.state.setting} onChange={this.handleSettingChange}></textarea>
                     </div>
                 </div>
                 {this.props.type == 0 && <div className="ui input">
@@ -179,8 +252,10 @@ export class Panel extends React.Component {
                     </input>
                 </div>}
                 <div className={"ui input"} >
-                    <input value={this.state.type} placeholder="Bot Type" onChange={this.handleTypeChange}>
-                    </input>
+                    <select className="select_style" value={this.state.type} placeholder="Bot Type" onChange={this.handleTypeChange}>
+                        <option value="" selected disabled hidden>Choose here</option>
+                        {options}
+                    </select>
                 </div>
                 <div className="ui input" >
                     <input value={this.state.count} placeholder="Count" onChange={this.handleCountChange}>

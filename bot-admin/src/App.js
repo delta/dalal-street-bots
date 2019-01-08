@@ -35,7 +35,7 @@ export default class App extends Component {
   }
   refresh = () => {
     var route = BASE_URL + '/getbotlist';
-    var method = 'POST';
+    var method = 'GET';
     /*var username = $("#username").val();
     var password = $("#password").val();*/
     var body = {
@@ -58,7 +58,7 @@ export default class App extends Component {
         numbers: numbers,
         selected: selected,
         type: 0,
-        lastId: settings[settings.length - 1]['id'],
+        lastId: ((settings[settings.length - 1]) ? settings[settings.length - 1]['id'] : 0),
       })
     });
   }
@@ -176,7 +176,8 @@ export default class App extends Component {
         selectedIndex={this.state.singleselected}
         selected={this.state.selected}
         setting={this.state.passedSettings}
-        allSettings={this.state.settings} />
+        allSettings={this.state.settings}
+        botTypes={this.state.bot_types} />
       <BotList numbers={this.state.numbers}
         settings={this.state.settings}
         selected={this.state.selected}
