@@ -33,10 +33,10 @@ async def hello():
 async def getbotlist():
     try:
         return_data = bot_manager.get_bots()
-        return json.dumps(return_data)
+        return json.dumps(return_data), 200
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route('/pausetype', methods=['POST'])
 async def pausetype():
@@ -49,10 +49,10 @@ async def pausetype():
         for bot in bots:
             if bot['type'] == bot_type:
                 await bot_manager.pause_bot(bot['id'])
-        return "bots paused"
+        return "bots paused", 200
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route('/unpausetype', methods=['POST'])
 async def unpausetype():
@@ -67,8 +67,8 @@ async def unpausetype():
                 await bot_manager.unpause_bot(bot['id'])
         return "bots paused"
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route('/pausetags', methods=['POST'])
 async def pausetag():
@@ -84,8 +84,8 @@ async def pausetag():
                 await bot_manager.pause_bot(bot['id'])
         return "bots paused"
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route('/unpausetags', methods=['POST'])
 async def unpausetag():
@@ -101,8 +101,8 @@ async def unpausetag():
                 await bot_manager.unpause_bot(bot['id'])
         return "bots paused"
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route('/loadbot', methods=['POST'])
 async def loadbot():
@@ -112,8 +112,8 @@ async def loadbot():
         asyncio.ensure_future(bot_manager.load_bot(bot_name))
         return "Loaded bot"
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route('/pauseall', methods=['POST'])
 async def pauseall():
@@ -124,8 +124,8 @@ async def pauseall():
             await bot_manager.pause_bot(bot_id)
         return "Paused bots"
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route('/unpauseall', methods=['POST'])
 async def unpauseall():
@@ -136,8 +136,8 @@ async def unpauseall():
             await bot_manager.unpause_bot(bot_id)
         return "Unpaused bots"
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route('/loadall', methods=['POST'])
 async def loadAll():
@@ -150,8 +150,8 @@ async def loadAll():
         else:
             return "already initialized"
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route('/createbot', methods=['POST'])
 async def create_bot():
@@ -168,8 +168,8 @@ async def create_bot():
 
         return "Bot " + bot_name + " of type " + bot_type + " was created"
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route('/pausebot', methods=['POST'])
 async def pause_bot():
@@ -184,8 +184,8 @@ async def pause_bot():
         await bot_manager.pause_bot(bot_id)
         return "Bot " + str(bot_id) + " was paused"
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route('/unpausebot', methods=['POST'])
 async def unpause_bot():
@@ -200,8 +200,8 @@ async def unpause_bot():
         await bot_manager.unpause_bot(bot_id)
         return "Bot " + str(bot_id) + " was unpaused"
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route('/getdetails', methods=['POST'])
 async def get_details():
@@ -215,8 +215,8 @@ async def get_details():
 
         return MessageToJson(return_data)
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 @app.route("/getlogs", methods=['POST'])
 async def get_logs():
@@ -232,8 +232,8 @@ async def get_logs():
         else:
             return await bot_manager.get_log(bot_id)
     except Exception as e:
-        print(e)
-        return e
+        print("[Failed]: {}".format(str(e)))
+        return "[Failed]: {}".format(str(e)), 400
 
 if __name__ == "__main__":
     IS_INITIALIZED = True

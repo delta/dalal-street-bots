@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PNotify from 'pnotify/dist/es/PNotify';
 import { Panel } from './Panel';
 import './index.css';
 import { BotList } from './BotList';
@@ -60,6 +61,8 @@ export default class App extends Component {
         type: 0,
         lastId: ((settings[settings.length - 1]) ? settings[settings.length - 1]['id'] : 0),
       })
+    }).fail((req, textStatus, errorThrown) => {
+      PNotify.alert(req.responseText);
     });
   }
   modifyBot = (setting) => {
