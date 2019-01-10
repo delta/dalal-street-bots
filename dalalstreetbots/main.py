@@ -65,7 +65,7 @@ async def unpausetype():
         for bot in bots:
             if bot['type'] == bot_type:
                 await bot_manager.unpause_bot(bot['id'])
-        return "bots paused"
+        return "bots paused", 200
     except Exception as e:
         print("[Failed]: {}".format(str(e)))
         return "[Failed]: {}".format(str(e)), 400
@@ -82,7 +82,7 @@ async def pausetag():
             bot_tag = bot['settings'].get('bot_tag')
             if bot_tag == required_tag:
                 await bot_manager.pause_bot(bot['id'])
-        return "bots paused"
+        return "bots paused", 200
     except Exception as e:
         print("[Failed]: {}".format(str(e)))
         return "[Failed]: {}".format(str(e)), 400
@@ -99,7 +99,7 @@ async def unpausetag():
             bot_tag = bot['settings'].get('bot_tag')
             if bot_tag == required_tag:
                 await bot_manager.unpause_bot(bot['id'])
-        return "bots paused"
+        return "bots paused", 200
     except Exception as e:
         print("[Failed]: {}".format(str(e)))
         return "[Failed]: {}".format(str(e)), 400
@@ -110,7 +110,7 @@ async def loadbot():
         data = await request.form
         bot_name = data['bot_name']
         asyncio.ensure_future(bot_manager.load_bot(bot_name))
-        return "Loaded bot"
+        return "Loaded bot", 200
     except Exception as e:
         print("[Failed]: {}".format(str(e)))
         return "[Failed]: {}".format(str(e)), 400
@@ -122,7 +122,7 @@ async def pauseall():
         for bot_id in data:
             bot_id = int(bot_id)
             await bot_manager.pause_bot(bot_id)
-        return "Paused bots"
+        return "Paused bots", 200
     except Exception as e:
         print("[Failed]: {}".format(str(e)))
         return "[Failed]: {}".format(str(e)), 400
@@ -134,7 +134,7 @@ async def unpauseall():
         for bot_id in data:
             bot_id = int(bot_id)
             await bot_manager.unpause_bot(bot_id)
-        return "Unpaused bots"
+        return "Unpaused bots", 200
     except Exception as e:
         print("[Failed]: {}".format(str(e)))
         return "[Failed]: {}".format(str(e)), 400
@@ -146,9 +146,9 @@ async def loadAll():
         if not IS_INITIALIZED:
             asyncio.ensure_future(bot_manager.load_all_bots())
             IS_INITIALIZED = True
-            return "initialized"
+            return "initialized", 200
         else:
-            return "already initialized"
+            return "already initialized", 200
     except Exception as e:
         print("[Failed]: {}".format(str(e)))
         return "[Failed]: {}".format(str(e)), 400
@@ -166,7 +166,7 @@ async def create_bot():
         bot_name = data['bot_name']
         asyncio.ensure_future(bot_manager.create_bot(bot_type, bot_name, bot_settings))
 
-        return "Bot " + bot_name + " of type " + bot_type + " was created"
+        return "Bot " + bot_name + " of type " + bot_type + " was created", 200
     except Exception as e:
         print("[Failed]: {}".format(str(e)))
         return "[Failed]: {}".format(str(e)), 400
@@ -182,7 +182,7 @@ async def pause_bot():
         data = await request.form
         bot_id = int(data['bot_id'])
         await bot_manager.pause_bot(bot_id)
-        return "Bot " + str(bot_id) + " was paused"
+        return "Bot " + str(bot_id) + " was paused", 200
     except Exception as e:
         print("[Failed]: {}".format(str(e)))
         return "[Failed]: {}".format(str(e)), 400
@@ -198,7 +198,7 @@ async def unpause_bot():
         data = await request.form
         bot_id = int(data['bot_id'])
         await bot_manager.unpause_bot(bot_id)
-        return "Bot " + str(bot_id) + " was unpaused"
+        return "Bot " + str(bot_id) + " was unpaused", 200
     except Exception as e:
         print("[Failed]: {}".format(str(e)))
         return "[Failed]: {}".format(str(e)), 400
@@ -213,7 +213,7 @@ async def get_details():
         bot_id = int(data['bot_id'])
         return_data = await asyncio.ensure_future(market_messenger.get_portfolio(bot_id))
 
-        return MessageToJson(return_data)
+        return MessageToJson(return_data), 200
     except Exception as e:
         print("[Failed]: {}".format(str(e)))
         return "[Failed]: {}".format(str(e)), 400
@@ -228,9 +228,9 @@ async def get_logs():
         bot_id   = data['bot_id']
 
         if bot_id == -1:
-            return await bot_manager.get_log(-1)
+            return await bot_manager.get_log(-1), 200
         else:
-            return await bot_manager.get_log(bot_id)
+            return await bot_manager.get_log(bot_id), 200
     except Exception as e:
         print("[Failed]: {}".format(str(e)))
         return "[Failed]: {}".format(str(e)), 400

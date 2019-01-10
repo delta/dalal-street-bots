@@ -6,13 +6,12 @@ class PricechangerIndicator(IndicatorBase):
         "lookup_window": 5 # sum of how many days to check with percentage_change
     }
 
-    update_type = "prices"
-    first_update = True
-    previous_price = 0
-    current_price = 0
-
     def __init__(self):
         self.prices = []
+        self.update_type = "prices"
+        self.first_update = True
+        self.previous_price = 0
+        self.current_price = 0
 
     def update(self, update):
         if self.first_update:
@@ -24,3 +23,4 @@ class PricechangerIndicator(IndicatorBase):
             self.prices.append(percentage)
             if len(self.prices) == self.default_settings['lookup_window']:
                 self.prices.pop(0)
+            self.previous_price = update

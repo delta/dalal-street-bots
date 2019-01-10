@@ -18,7 +18,7 @@ var bot_types = {
     'DumbBot': {
         "sleep_duration": 15, // in seconds. THIS SETTING IS REQUIRED
     },
-    'OverBoughtOverSold': {
+    'OverBoughtOverSoldBot': {
         "sleep_duration": 15, // in seconds. THIS SETTING IS REQUIRED
         "no_of_companies": 10, // number of companies to buy from. Technically should be ALL
         "bot_tag": "unset", // special tags for searching purpose
