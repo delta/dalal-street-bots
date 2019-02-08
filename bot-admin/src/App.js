@@ -11,9 +11,10 @@ var names = ["Delta", "Beta", "Gamma", "Tau", "Epsilon", "Theta", "Omega", "Alph
 
 export var IntegertoName = (id) => {
   let y = "";
+  let namesLength = names.length;
   do {
-    y += names[id % 10] + " "
-    id = Math.floor(id / 10)
+    y += names[id % namesLength] + " "
+    id = Math.floor(id / namesLength)
   } while (id > 0);
   return y;
 }
@@ -23,30 +24,24 @@ export default class App extends Component {
     super(props);
 
     this.state = {
-      settings: [],
+      settings: [], // array of bots retrieved. 
       numbers: [],
       selected: [],
       singleselected: -1,
       defaultsettings: { "k": 3 },
       passedSettings: { "k": 3 },
-      type: 0,
+      type: 0, // 0 for nothing selected
       lastId: 0,
     }
     this.refresh();
   }
   refresh = () => {
-    var route = BASE_URL + '/getbotlist';
-    var method = 'GET';
-    /*var username = $("#username").val();
-    var password = $("#password").val();*/
-    var body = {
-      //"admin_roll": username,
-      //"admin_pass": password
-    }
-    var request = $.ajax({
+    let route = BASE_URL + '/getbotlist';
+    let method = 'GET';
+    let request = $.ajax({
       url: route,
       method: method,
-      data: body
+      data: {}
     });
 
     request.done((data) => {
@@ -69,8 +64,6 @@ export default class App extends Component {
     let numbers = this.state.numbers.slice();
     let settings = this.state.settings.slice();
     if (this.state.type == 1) {
-      let mysettings = JSON.parse(setting);
-      console.log(settings);
       settings[this.state.singleselected]['settings'] = JSON.parse(setting);
     }
     this.setState({
@@ -85,28 +78,22 @@ export default class App extends Component {
     var route = BASE_URL + '/createbot';
     let lastId = this.state.lastId
     var method = 'POST';
-    /*var username = $("#username").val();
-    var password = $("#password").val();*/
     if (count == 1) {
       var body = {
-        //"admin_roll": username,
         "bot_name": name,
         "bot_type": type,
         "bot_settings": setting,
-        //"admin_pass": password
       }
       var request = $.ajax({
         url: route,
         method: method,
         data: body
       });
-      console.log(body);
       request.done((data) => {
         this.refresh()
       });
     } else {
       let rangeSettings = JSON.parse(setting);
-      console.log(count);
       for (var i = 0; i < count; i++) {
         let currentSettings = {};
         for (var key in rangeSettings) {
@@ -118,18 +105,15 @@ export default class App extends Component {
           }
         }
         var body = {
-          //"admin_roll": username,
           "bot_name": IntegertoName(lastId + i+1),
           "bot_type": type,
           "bot_settings": JSON.stringify(currentSettings),
-          //"admin_pass": password
         }
         var request = $.ajax({
           url: route,
           method: method,
           data: body
         });
-        console.log(body);
         let usercount=0;
         request.done((data) => {
           this.refresh();
@@ -147,9 +131,6 @@ export default class App extends Component {
     })
   }
   handleSingleSelect = (number) => {
-    console.log(number)
-    console.log(this.state.settings);
-    console.log(this.state.settings[number])
     var x = this.state.settings[number]['settings']
     var selected = this.state.selected;
     for (var i = 0; i < selected.length; i++) {

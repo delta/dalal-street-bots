@@ -86,12 +86,9 @@ export class Panel extends React.Component {
     getLogs = (index) => {
         var route = BASE_URL + '/getlogs';
         var method = 'POST';
-        console.log(index);
-        console.log(this.props.setting)
         var userId = this.props.allSettings[index]['id']
         var body = {
             "bot_id": userId,
-            //"admin_pass": password
         }
         var request = $.ajax({
             url: route,
@@ -100,11 +97,8 @@ export class Panel extends React.Component {
         });
 
         request.done((data) => {
-            console.log("hi")
-            console.log(data);
             let x = JSON.parse(data);
             let y = "";
-            console.log(x)
             Object.keys(x).map((val) => {
                 y += x[val][2] + " : " + x[val][1] + "\n"
             })
@@ -116,11 +110,9 @@ export class Panel extends React.Component {
     pause = () => {
         var route = BASE_URL + '/pausebot';
         var method = 'POST';
-        console.log(this.props.setting)
         var botId = this.props.allSettings[this.props.selectedIndex]['id']
         var body = {
             "bot_id": botId,
-            //"admin_pass": password
         }
         var request = $.ajax({
             url: route,
@@ -135,11 +127,9 @@ export class Panel extends React.Component {
     unpause = () => {
         var route = BASE_URL + '/unpausebot';
         var method = 'POST';
-        console.log(this.props.setting)
         var botId = this.props.allSettings[this.props.selectedIndex]['id']
         var body = {
             "bot_id": botId,
-            //"admin_pass": password
         }
         var request = $.ajax({
             url: route,
@@ -154,7 +144,6 @@ export class Panel extends React.Component {
     unpauseMultiple = () => {
         var route = BASE_URL + '/unpausebot';
         var method = 'POST';
-        console.log(this.props.setting)
         Object.keys(this.props.selected).forEach((key) => {
             if (this.props.selected[key]) {
                 var botId = this.props.allSettings[key]['id']
@@ -177,7 +166,6 @@ export class Panel extends React.Component {
     pauseMultiple = () => {
         var route = BASE_URL + '/pausebot';
         var method = 'POST';
-        console.log(this.props.setting)
         Object.keys(this.props.selected).forEach((key) => {
             if (this.props.selected[key]) {
                 var botId = this.props.allSettings[key]['id']
@@ -198,8 +186,6 @@ export class Panel extends React.Component {
 
     }
     componentWillReceiveProps = (props) => {
-        console.log(props.selectedIndex)
-        console.log(props.type)
         if (props.selectedIndex != -1 && props.type == 1) {
             this.getLogs(props.selectedIndex)
         } else {
@@ -219,7 +205,6 @@ export class Panel extends React.Component {
         })
     }
     handleSettingChange = (e) => {
-        console.log(e.target.value);
         this.setState({
             setting: e.target.value,
         })

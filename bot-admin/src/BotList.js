@@ -11,32 +11,35 @@ export class BotList extends React.Component {
         }
     }
     componentWillReceiveProps = (props)=>{
-        console.log(props)
         this.setState({
             selected:props.selected
         })
     }
+    // this method is triggered when a click on a non input box is made. type is set to 1
     handleClick = (i) => {
         this.props.handleSingleSelect(i)
     }
+    // this method is triggered when a click on the checkbox is made. type is set to 2
     handleToggle = (number) => {
         let selected = this.state.selected.slice();
         selected[number] = !selected[number];
         this.props.selectAll(selected)
     }
+    // search based on name
     handleNameSearchChange = (e) => {
         this.setState({
             nameFilter: e.target.value
         })
     }
+    // search based on tag
     handleTagSearchChange = (e) => {
         this.setState({
             tagFilter: e.target.value
         })
     }
+    // this is called when the header is clicked to select all
     selectAll = () => {
         let selected = this.state.selected.slice();
-        console.log(selected)
         this.props.numbers.map((number) => {
             let x = this.props.settings[number]['name'];
             let y = this.props.settings[number]['settings']['tag']
