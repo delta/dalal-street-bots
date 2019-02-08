@@ -3,9 +3,13 @@
 import os
 import json
 import asyncio
+import traceback
+import sqlite3
 
 def hash_dict(mydict):
     return json.dumps(mydict, sort_keys=True)
+
+DB_NAME = "dalalstreetbots.db"
 
 class IndicatorManager:
     """IndicatorManager class is used to manage all indicator"""
@@ -13,11 +17,21 @@ class IndicatorManager:
     def __init__(self, market_messenger, loop=None):
         self.market_messenger = market_messenger
         self.loop = loop
-
+        self.conn = sqlite3.connect(DB_NAME)
+        self.cursor = self.conn.cursor()
         self.indicator_count = 0
         self.__indicators__ = dict()
         asyncio.ensure_future(self.start_stock_prices_stream())
         #asyncio.ensure_future(self.start_market_depth_streams())
+
+    def write_to_logs(self, bot_id, text):
+        try:
+            self.cursor.execute("""INSERT INTO logs (bot_id, log, created_at) VALUES  (?, ?, time('now'))""", (bot_id, text))
+            self.conn.commit()
+        except Exception as e:
+            error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+            error_message = "Got error: {} @@@ {}".format(str(e), error_traceback)
+            print("Fatal error while writing to db. Error: {}".format(error_message))
 
     async def start_stock_prices_stream(self):
         while True:
@@ -33,19 +47,26 @@ class IndicatorManager:
                                     indicator.update(update.prices[stock_id])
                         
             except Exception as e:
-                print("Unexpected error happened in stock prices stream: ", e)
-                raise e
+                error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+                error_message = "Got Error: {} @@@ {}".format(str(e), error_traceback)
+                self.write_to_logs(0, error_message)
+                return "Failed", 400
             
             await asyncio.sleep(2)
 
     async def start_market_depth_streams(self):
-        await asyncio.sleep(3)
-        all_stocks = self.market_messenger.stocks
-        for stock_id in all_stocks:
-            asyncio.ensure_future(self.start_market_depth_stream(stock_id))
+        try:
+            await asyncio.sleep(3)
+            all_stocks = self.market_messenger.stocks
+            for stock_id in all_stocks:
+                asyncio.ensure_future(self.start_market_depth_stream(stock_id))
+        except Exception as e:
+            error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+            error_message = "Got Error: {} @@@ {}".format(str(e), error_traceback)
+            self.write_to_logs(0, error_message)
+            return "Failed", 400
 
     async def start_market_depth_stream(self, stock_id):
-        print("starting market depth stream for stock_id ", stock_id)
         while True:
             try:
                 stream = await self.market_messenger.get_market_depth_stream(stock_id)
@@ -63,8 +84,9 @@ class IndicatorManager:
                                     indicator.update(first_update, update)
 
             except Exception as e:
-                print("Unexpected error happened in market depth stream of stockid: ", stock_id, e)
-                raise e
+                error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+                error_message = "Got Error: {} @@@ {}".format(str(e), error_traceback)
+                self.write_to_logs(0, error_message)
                 await asyncio.sleep(2)
 
     def get_indicator_types(self):

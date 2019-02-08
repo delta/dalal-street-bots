@@ -2,8 +2,24 @@
 
 import asyncio
 import json
+import sqlite3
+import traceback
+
+DB_NAME = "dalalstreetbots.db"
+
 class BotBase(object):
     """BotBase class defines the base class for all bots"""
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    def write_to_logs(self, bot_id, text):
+        try:
+            BotBase.cursor.execute("""INSERT INTO logs (bot_id, log, created_at) VALUES  (?, ?, time('now'))""", (bot_id, text))
+            BotBase.conn.commit()
+        except Exception as e:
+            error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+            error_message = "Got error: {} @@@ {}".format(str(e), error_traceback)
+            print("Fatal error while writing to db. Error: {}".format(error_message))
 
     async def _hidden_init_(self, id, name, settings, bot_manager, indicator_manager, market_messenger):
         """_hidden_init is used by the Bot Manager. DO NOT OVERRIDE"""
@@ -24,37 +40,67 @@ class BotBase(object):
 
     async def get_my_cash(self):
         """get_my_cash returns the cash owned by the bot"""
-        resp = await self.__market_messenger.get_portfolio(self.id)
-        return resp.user.cash
+        try:
+            resp = await self.__market_messenger.get_portfolio(self.id)
+            return resp.user.cash
+        except Exception as e:
+            error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+            error_message = "Got error: {} @@@ {}".format(str(e), error_traceback)
+            self.write_to_logs(self.id, error_message)
 
     async def get_my_portfolio(self):
         """returns a map<int,int> key being the stockid and value being the number of owned stocks"""
-        resp = await self.__market_messenger.get_portfolio(self.id)
-        return resp.stocks_owned
+        try:
+            resp = await self.__market_messenger.get_portfolio(self.id)
+            return resp.stocks_owned
+        except Exception as e:
+            error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+            error_message = "Got error: {} @@@ {}".format(str(e), error_traceback)
+            self.write_to_logs(self.id, error_message)
 
     async def buy_stocks_from_exchange(self, stock_id, stock_quantity):
         """Buy stocks from Exchange"""
-        return await self.__market_messenger.buy_stocks_from_exchange(
-            self.id, stock_id, stock_quantity
-        )
+        try:
+            return await self.__market_messenger.buy_stocks_from_exchange(
+                self.id, stock_id, stock_quantity
+            )
+        except Exception as e:
+            error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+            error_message = "Got error: {} @@@ {}".format(str(e), error_traceback)
+            self.write_to_logs(self.id, error_message)
 
     async def place_buy_order(self, stock_id, stock_quantity, price, order_type):
         """place Bid order"""
-        return await self.__market_messenger.place_buy_order(
-            self.id, stock_id, stock_quantity, price, order_type
-        )
+        try:
+            return await self.__market_messenger.place_buy_order(
+                self.id, stock_id, stock_quantity, price, order_type
+            )
+        except Exception as e:
+            error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+            error_message = "Got error: {} @@@ {}".format(str(e), error_traceback)
+            self.write_to_logs(self.id, error_message)
 
     async def place_sell_order(self, stock_id, stock_quantity, price, order_type):
         """place ask order"""
-        return await self.__market_messenger.place_sell_order(
-            self.id, stock_id, stock_quantity, price, order_type
-        )
+        try:
+            return await self.__market_messenger.place_sell_order(
+                self.id, stock_id, stock_quantity, price, order_type
+            )
+        except Exception as e:
+            error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+            error_message = "Got error: {} @@@ {}".format(str(e), error_traceback)
+            self.write_to_logs(self.id, error_message)
 
     async def cancel_order(self, order_id, is_ask):
         """cancel buy/sell order"""
-        return await self.__market_messenger.cancel_order(
-            self.id, order_id, is_ask
-        )
+        try:
+            return await self.__market_messenger.cancel_order(
+                self.id, order_id, is_ask
+            )
+        except Exception as e:
+            error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+            error_message = "Got error: {} @@@ {}".format(str(e), error_traceback)
+            self.write_to_logs(self.id, error_message)
 
     async def run(self):
         """Run the bot. DO NOT OVERRIDE. Should be called only once!"""
@@ -65,7 +111,12 @@ class BotBase(object):
         self.__should_run = True
         while self.__should_run:
             await asyncio.sleep(self.settings["sleep_duration"])
-            await self.update()
+            try:
+                await self.update()
+            except Exception as e:
+                error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+                error_message = "Got error: {} @@@ {}".format(str(e), error_traceback)
+                self.write_to_logs(self.id, error_message)
 
     def pause(self):
         """Pauses the bot's execution. DO NOT OVERRIDE."""
@@ -76,14 +127,6 @@ class BotBase(object):
         """Unpause the bot's execution"""
         self.__should_run = True
         asyncio.ensure_future(self.run())
-
-    def add_to_log(self,bot_id, log_message):
-        """Logs stuff to database
-        """
-        self.__bot_manager.cursor.execute("""insert into logs (
-                                            bot_id, log, created_at) values (?, ?, time('now')
-                                            )""",(bot_id, log_message))
-        self.__bot_manager.conn.commit()
 
     async def update(self):
         """update method MUST BE OVERRIDDEN by *all* bots inheriting BotBase"""
