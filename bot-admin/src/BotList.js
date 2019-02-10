@@ -1,29 +1,12 @@
 import React from 'react';
-import App from './App'
 
 export class BotList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selected: this.props.selected,
             nameFilter: "",
             tagFilter: "",
         }
-    }
-    componentWillReceiveProps = (props)=>{
-        this.setState({
-            selected:props.selected
-        })
-    }
-    // this method is triggered when a click on a non input box is made. type is set to 1
-    handleClick = (i) => {
-        this.props.handleSingleSelect(i)
-    }
-    // this method is triggered when a click on the checkbox is made. type is set to 2
-    handleToggle = (number) => {
-        let selected = this.state.selected.slice();
-        selected[number] = !selected[number];
-        this.props.selectAll(selected)
     }
     // search based on name
     handleNameSearchChange = (e) => {
@@ -39,23 +22,44 @@ export class BotList extends React.Component {
     }
     // this is called when the header is clicked to select all
     selectAll = () => {
-        let selected = this.state.selected.slice();
-        this.props.numbers.map((number) => {
-            let x = this.props.settings[number]['name'];
-            let y = this.props.settings[number]['settings']['tag']
-            if (!y && this.state.tagFilter != "")
-                return;
-            if (y && y.indexOf(this.state.tagFilter) === -1)
-                return;
-            if (x.indexOf(this.state.nameFilter) !== -1) {
-                selected[number] = true;
-                return;
-            }
-            selected[number] = false;
-        })
-        this.props.selectAll(selected)
+        let newBotList = this.props.botList.filter((botObj) => {
+            return botObj['name'].includes(this.state.nameFilter)
+        }).map((botObj) => {
+            return botObj['id'];
+        });
+        this.props.handleSelection(newBotList);
     }
+
+    getBotList(botList) {
+        let newBotList = botList.filter((botObj) => {
+            return botObj['name'].includes(this.state.nameFilter);
+        }).map((botObj) => {
+            let botId = botObj['id'];
+            let botArr = [botId];
+                return (
+                    <tr value={botId}>
+                        <td>{botObj['id']}</td>
+                        <td>{botObj['name']}</td>
+                        <td>{botObj['type']}</td >
+                        <td>{botObj['settings']['tag'] ? botObj['settings']['tag'] : ''}</td >
+                        <td>{botObj['is_paused'] === 0 ? "Active": "Paused"}</td >
+                        <td className="collapsing">
+                            <div className="ui fitted checkbox">
+                                <input type="checkbox"
+                                    checked={this.props.selected[botId]}
+                                    onClick={(botId) => { this.props.handleSelection(botArr); return }}
+                                />
+                                <label></label>
+                            </div>
+                        </td>
+                    </tr>
+                );
+        });
+        return newBotList;
+    }
+
     render() {
+        let botList = this.getBotList(this.props.botList);
         return (
             <div>
                 <div className="ui input field name-search">
@@ -72,42 +76,12 @@ export class BotList extends React.Component {
                                 <th>Name</th>
                                 <th>Type</th>
                                 <th>Tag</th>
+                                <th>Status</th>
                                 <th onClick={this.selectAll}><i className="check icon"></i></th>
                             </tr>
                         </thead>
                         <tbody>
-                            {
-                                this.props.numbers.map((number) => {
-                                    console.log(this.state.selected)
-                                    console.log(number)
-                                    let x = this.props.settings[number]['name']
-                                    let y = this.props.settings[number]['settings']['tag']
-                                    if (!y && this.state.tagFilter != "")
-                                        return;
-                                    if (y && y.indexOf(this.state.tagFilter) === -1)
-                                        return;
-                                    if (x.indexOf(this.state.nameFilter) !== -1) {
-                                        return (
-                                            <tr value={number}  onClick={(i) => { this.handleClick(number) }}>
-                                                <td>{this.props.settings[number]['id']}</td>
-                                                <td>{this.props.settings[number]['name']}</td>
-                                                <td>{this.props.settings[number]['type']}</td >
-                                                <td>{this.props.settings[number]['settings']['tag']}</td >
-                                                <td className="collapsing">
-                                                    <div className="ui fitted checkbox">
-                                                        <input type="checkbox"
-                                                            checked={this.state.selected[number]}
-                                                            onClick={(e) => { this.handleToggle(number);e.stopPropagation()}}
-                                                        />
-                                                        <label></label>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )
-                                    }
-                                }
-                                )
-                            }
+                            {botList}
                         </tbody>
                     </table>
                 </div>
