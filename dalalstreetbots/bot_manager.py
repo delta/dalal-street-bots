@@ -190,7 +190,7 @@ class BotManager:
         try:
             if bot_id in self.bot_instances.keys():
                 self.bot_instances[bot_id].unpause()
-                self.cursor.execute("UPDATE bots SET is_paused = 0""", False)
+                self.cursor.execute("UPDATE bots SET is_paused = 0""")
                 self.conn.commit()
             else:
                 raise Exception("Invalid bot_id!")

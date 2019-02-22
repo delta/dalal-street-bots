@@ -69,6 +69,14 @@ var bot_types = {
         "no_of_companies": 10, // number of companies to buy from
         "bot_tag": "unset", // special tags for searching purpose
         "k": 5,
+    },
+    'MarketmakerBot': {
+        "sleep_duration": 15, // in seconds. THIS SETTING IS REQUIRED
+        "no_of_companies": 15, // number of companies to buy from. Technically should be ALL
+        "bot_tag": "unset", // special tags for searching purpose
+        "e_start": 2, // value of e will go from [e_start, e_end]
+        "e_end": 4, // value of e will go from [e_start, e_end]
+        "percent_diff": 2 // if bid spread percent is less than this, do nothing
     }
 };
 
