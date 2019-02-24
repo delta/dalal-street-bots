@@ -41,7 +41,6 @@ class OverBoughtOverSoldBot(BotBase):
 
                     log_message = "OverBoughtOverSold({}) sold stock {}".format(self.name, str(stock_id))
                     print(log_message)
-                    self.add_to_log(self.id, log_message)
                 elif percentage_change < self.settings['percentage_change']*-1:
                     # if percentage_change is too rapid, place buy orders at slightly higher price
                     cut_down_percent = abs(percentage_change/self.settings['cut_down_factor'])
@@ -50,10 +49,7 @@ class OverBoughtOverSoldBot(BotBase):
                     
                     log_message = "OverBoughtOverSold({}) bought stock {}".format(self.name, stock_id)
                     print(log_message)
-                    self.add_to_log(self.id, log_message)
 
         except Exception as e:
             log_message = "OverBoughtOverSold({}) just broke. Cause: {}".format(self.name, str(e))
-            print(log_message)
-            self.add_to_log(self.id, log_message)
         

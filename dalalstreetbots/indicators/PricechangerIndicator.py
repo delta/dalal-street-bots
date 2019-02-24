@@ -3,7 +3,7 @@ from indicators.IndicatorBase import IndicatorBase
 class PricechangerIndicator(IndicatorBase):
 
     default_settings = {
-        "lookup_window": 5 # sum of how many days to check with percentage_change
+        "lookup_window": 6 # sum of how many days to check with percentage_change
     }
 
     def __init__(self):
@@ -14,6 +14,7 @@ class PricechangerIndicator(IndicatorBase):
         self.current_price = 0
 
     def update(self, update):
+        print("got update", update)
         if self.first_update:
             self.first_update = False
             self.previous_price = self.current_price = update
@@ -21,6 +22,6 @@ class PricechangerIndicator(IndicatorBase):
             self.current_price = update
             percentage = (self.current_price - self.previous_price)/self.previous_price*100.0
             self.prices.append(percentage)
-            if len(self.prices) == self.default_settings['lookup_window']:
+            if len(self.prices) > self.settings['lookup_window']:
                 self.prices.pop(0)
             self.previous_price = update

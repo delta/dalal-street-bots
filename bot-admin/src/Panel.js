@@ -77,7 +77,15 @@ var bot_types = {
         "e_start": 2, // value of e will go from [e_start, e_end]
         "e_end": 4, // value of e will go from [e_start, e_end]
         "percent_diff": 2 // if bid spread percent is less than this, do nothing
-    }
+    },
+    'ModernportfolioBot': {
+        "sleep_duration": 15, // in seconds. THIS SETTING IS REQUIRED
+        "no_of_companies": 15, // number of companies to buy from. Technically should be ALL
+        "bot_tag": "unset", // special tags for searching purpose
+        "n": 6, // number of companies for the buy-and-hold strategy
+        'lookup_window': 5,  // number of entries to look for in indicator
+        'trade_wait_duration': 5,  // amount to wait before you can sell whatever you bought
+    },
 };
 
 export class Panel extends React.Component {

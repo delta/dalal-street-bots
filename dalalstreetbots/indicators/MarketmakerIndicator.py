@@ -9,7 +9,6 @@ class MarketmakerIndicator(IndicatorBase):
     update_type = "market_depth"
 
     def __init__(self):
-        # private, not required outside
         self.first_update_done = False
 
         self.ask_depth = {}
@@ -46,12 +45,12 @@ class MarketmakerIndicator(IndicatorBase):
 
         self.min_sell = 1e9
         for price in self.ask_depth:
-            if price != 0:
+            if price != 0 and self.ask_depth[price] != 0:
                 self.min_sell = min(self.min_sell, price)
 
         self.max_buy = 0
         for price in self.bid_depth:
-            if price != 0:
+            if price != 0 and self.bid_depth[price] != 0:
                 self.max_buy = max(self.max_buy, price)
 
         self.max_buy_is_market_order = self.max_buy == 0

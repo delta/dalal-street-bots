@@ -1,5 +1,6 @@
 from bots.BotBase import BotBase
 import random
+import traceback
 
 class MarketmakerBot(BotBase):
     """Marketmaker bot acts as the market maker for Dalalstreet
@@ -24,15 +25,15 @@ class MarketmakerBot(BotBase):
         self.settings = {**self.default_settings, **self.settings}
         self.current_time = 0 # how many instances have occured since last buying
         self.last_buy_price = 0 # if the last_buy_price is max_buy, then you already have the highest bid
-        self.last_sell_price = 0 # if the last_sell_price is min_sell, then you already have the lowest ask
+        self.last_sell_price = 10**9 # if the last_sell_price is min_sell, then you already have the lowest ask
 
     async def load_indicators(self):
         self.marketdepthindicator = {}
         self.stockchangerindicator = {}
 
-        for i in range(1, self.settings["no_of_companies"]):
+        for i in range(1, self.settings["no_of_companies"]+1):
             self.marketdepthindicator[i] = await self.get_indicator("MarketmakerIndicator", i, {})
-        for i in range(1, self.settings["no_of_companies"]):
+        for i in range(1, self.settings["no_of_companies"]+1):
             self.stockchangerindicator[i] = await self.get_indicator("StockchangerIndicator", i, {})
 
     async def update(self, *args, **kwargs):
@@ -41,17 +42,16 @@ class MarketmakerBot(BotBase):
             selected_stock = 0
             max_percent_diff = 0
             e = random.randint(self.settings['e_start'], self.settings['e_end'])
-            for stock_id in range(1, self.settings['no_of_companies']):
+            for stock_id in range(1, self.settings['no_of_companies']+1):
                 if self.marketdepthindicator[stock_id].first_update_done and self.stockchangerindicator[stock_id].price > 0:
                     max_buy = self.marketdepthindicator[stock_id].max_buy
                     min_sell = self.marketdepthindicator[stock_id].min_sell
                     max_buy_is_market_order = self.marketdepthindicator[stock_id].max_buy_is_market_order
                     min_sell_is_market_order = self.marketdepthindicator[stock_id].min_sell_is_market_order
                     current_price = self.stockchangerindicator[stock_id].price
-
-                    if max_buy_is_market_order:
+                    if max_buy_is_market_order or max_buy == 0:
                         max_buy = int(round(current_price*0.85))
-                    if min_sell_is_market_order:
+                    if min_sell_is_market_order or min_sell == 10**9:
                         min_sell = int(round(current_price*1.15))
 
                     percent_diff = (min_sell - max_buy)/max_buy*100
@@ -61,12 +61,16 @@ class MarketmakerBot(BotBase):
             if max_percent_diff > self.settings['percent_diff']:
                 qty1 = random.randint(1,3)
                 qty2 = random.randint(1,3)
-                if max_buy > self.last_buy_price:
+                if max_buy >= self.last_buy_price:
                     await self.place_buy_order(selected_stock, int(qty1), int(max_buy + e), 0)
                     self.last_buy_price = int(max_buy + e)
-                if min_sell < self.last_sell_price:
+                if min_sell <= self.last_sell_price:
                     await self.place_sell_order(selected_stock, int(qty2), int(min_sell - e), 0)
                     self.last_sell_price = int(min_sell - e)
 
         except Exception as e:
             log_message = "MarketmakerBot({}) just broke. Cause: {}".format(self.name, str(e))
+            print(log_message)
+            error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+            error_message = "Got Error: {} @@@ {}".format(str(e), error_traceback)
+            self.write_to_logs(self.id, error_message)
