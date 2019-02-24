@@ -21,7 +21,8 @@ class PricechangerIndicator(IndicatorBase):
         else:
             self.current_price = update
             percentage = (self.current_price - self.previous_price)/self.previous_price*100.0
-            self.prices.append(percentage)
-            if len(self.prices) > self.settings['lookup_window']:
-                self.prices.pop(0)
-            self.previous_price = update
+            if percentage:
+                self.prices.append(percentage)
+                if len(self.prices) > self.settings['lookup_window']:
+                    self.prices.pop(0)
+                self.previous_price = update
