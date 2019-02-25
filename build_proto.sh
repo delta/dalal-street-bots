@@ -1,5 +1,8 @@
 #!/bin/bash
 
+if [ ! -d dalalstreetbots/proto_build ]; then
+    mkdir dalalstreetbots/proto_build
+fi
 rm -rf dalalstreetbots/proto_build/*
 python3 -m grpc_tools.protoc -I./proto --python_out=dalalstreetbots/proto_build/ --grpc_python_out=dalalstreetbots/proto_build/ ./proto/*.proto
 python3 -m grpc_tools.protoc -I./proto --python_out=dalalstreetbots/proto_build/ ./proto/actions/*.proto
