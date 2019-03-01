@@ -1,7 +1,8 @@
 """Test script"""
 
-import asyncio
-import aiogrpc as grpc
+#import asyncio
+#import aiogrpc as grpc
+import grpc
 import traceback
 import sqlite3
 
@@ -16,6 +17,46 @@ from proto_build.datastreams.Subscribe_pb2 import STOCK_PRICES, STOCK_EXCHANGE, 
 from proto_build.datastreams.Subscribe_pb2 import SubscribeRequest
 
 DB_NAME = "dalalstreetbots.db"
+
+def connect():
+    """Connect to the server"""
+#    try:
+    print("Market manager attempting to connect")
+    cert = open('grpc-server.crt').read().encode("utf8")
+    key = open('grpc-server.key').read().encode('utf8')
+    creds = grpc.ssl_channel_credentials(cert, key)
+    channel = grpc.insecure_channel(
+            "159.65.148.150:7000",
+    )
+    action_stub = DalalMessage_pb2_grpc.DalalActionServiceStub(channel)
+    stream_stub = DalalMessage_pb2_grpc.DalalStreamServiceStub(channel)
+    return action_stub, stream_stub
+#    except Exception as e:
+#        error_traceback = ''.join(traceback.format_tb(e.__traceback__))
+#        error_message = "Got error: {} @@@ {}".format(str(e), error_traceback)
+#        print(error_message)
+def __getmd_for_bot(bot_userid=None):
+    """Get metadata for making bot requests. Optionally get metadata so that the request
+    acts as if it was made by bot_userid"""
+    bot_secret = "hello bots"
+    if bot_userid is None:
+        return [("bot_secret", bot_secret), ("bot_user_id", "fakeid")]
+    else:
+        return [("bot_secret", bot_secret), ("bot_user_id", str(bot_userid))]
+
+def create_bot(action_stub, botname):
+    """creates a bot user on the server"""
+    print("Create bot request")
+    req = CreateBotRequest(bot_user_id=botname)
+    res = action_stub.CreateBot(req, metadata=__getmd_for_bot())
+    print("Sent bot request")
+    if res.status_code != CreateBotResponse.OK:
+        print(res)
+        raise Exception("Got non-OK code. Didn't create bot")
+    return res
+
+act, stream = connect()
+create_bot(act, "paibot")
 
 class MarketMessenger:
     """This class coordinates with the gRPC server"""
@@ -311,13 +352,13 @@ class MarketMessenger:
             self.write_to_logs(-1, error_message)
             return "Failed", 400
 
-# Master control's mother
-def main():
-    market_messenger = MarketMessenger()
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(market_messenger.start())
-    loop.close()
-
-# Master control's grandmother
-if __name__ == "__main__":
-    main()
+## Master control's mother
+#def main():
+#    market_messenger = MarketMessenger()
+#    loop = asyncio.get_event_loop()
+#    loop.run_until_complete(market_messenger.start())
+#    loop.close()
+#
+## Master control's grandmother
+#if __name__ == "__main__":
+#    main()
