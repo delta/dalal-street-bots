@@ -7,12 +7,18 @@ Created on 2017/8/14
 import asyncio
 import functools
 import queue
-from asyncio.futures import CancelledError
+from asyncio import CancelledError
+import logging
+import grpc
+
+logger = logging.getLogger(__name__)
+
 
 def wrap_callback(callback, loop):
     @functools.wraps(callback)
     def _callback(*args, **kwargs):
-        loop.call_soon_threadsafe(functools.partial(callback, *args, **kwargs))
+        if not loop.is_closed():
+            loop.call_soon_threadsafe(functools.partial(callback, *args, **kwargs))
     return _callback
 
 
@@ -48,7 +54,8 @@ def wrap_future(grpc_fut, loop):
             grpc_fut.cancel()
 
     def _call_set_state(grpc_fut):
-        loop.call_soon_threadsafe(_set_state, grpc_fut, fut_)
+        if not loop.is_closed():
+            loop.call_soon_threadsafe(_set_state, grpc_fut, fut_)
 
     fut_.add_done_callback(_call_check_cancel)
     grpc_fut.add_done_callback(_call_set_state)
@@ -112,11 +119,11 @@ class WrappedIterator(object):
                       'trailing_metadata',
                       'code',
                       'details'],
-                     functools.partial(wrap_active_test, test=grpc_iterator.is_active, loop=loop, executor=executor))        
-        
+                     functools.partial(wrap_active_test, test=grpc_iterator.is_active, loop=loop, executor=executor))
+
     def __aiter__(self):
         return self
-    
+
     def _next(self):
         if self._iterator is None:
             raise StopAsyncIteration
@@ -126,24 +133,36 @@ class WrappedIterator(object):
             raise StopAsyncIteration
         except Exception:
             raise
-    
+
     async def __anext__(self):
         if self._next_future is None:
             if self._iterator is None:
                 raise StopAsyncIteration
             self._next_future = self._loop.run_in_executor(self._stream_executor, self._next)
+
+            def cb(fut):
+                try:
+                    fut.result()
+                except (StopAsyncIteration, StopIteration):
+                    pass
+                except grpc.RpcError as ex:
+                    if ex.code() != grpc.StatusCode.CANCELLED:
+                        logger.exception("__anext__ grpc exception")
+
+            self._next_future.add_done_callback(cb)
         try:
-            return await asyncio.shield(self._next_future, loop=self._loop)
+            return await asyncio.shield(self._next_future)
         finally:
             if self._next_future and self._next_future.done():
                 self._next_future = None
-    
+
     def __del__(self):
         if self._iterator is not None:
             self.cancel()
             self._iterator = None
         if self._next_future is not None:
-            self._next_future.cancel()
+            if not self._loop.is_closed():
+                self._loop.call_soon_threadsafe(lambda f=self._next_future: f.cancel())
             self._next_future = None
         if not self._shared_executor and self._stream_executor is not None:
             self._stream_executor.shutdown()
@@ -159,7 +178,7 @@ class IteratorScope(object):
 
     async def __aenter__(self):
         return self._iter
-    
+
     async def __aexit__(self, exc_val, exc_typ, exc_tb):
         await self._iter.aclose()
 
@@ -185,9 +204,9 @@ class WrappedAsyncIterator(object):
             self._q.put((None, True))
             return
         if self._next_future is None:
-            self._next_future = asyncio.ensure_future(self._async_iter.__anext__(), loop=self._loop)
+            self._next_future = asyncio.ensure_future(self._async_iter.__anext__())
         try:
-            done, _ = await asyncio.wait([self._stop_future, self._next_future], loop=self._loop,
+            done, _ = await asyncio.wait([self._stop_future, self._next_future],
                                    return_when=asyncio.FIRST_COMPLETED)
             if self._stop_future in done:
                 self._q.put((await self._stop_future, True))
@@ -206,14 +225,15 @@ class WrappedAsyncIterator(object):
             self._q.put((None, True))
         except Exception as exc:
             self._q.put((exc, True))
-        
+
     def __next__(self):
         if self._async_iter is None:
             raise StopIteration
         try:
             r, is_exc = self._q.get_nowait()
         except queue.Empty:
-            self._loop.call_soon_threadsafe(functools.partial(asyncio.ensure_future, self._next(), loop=self._loop))
+            if not self._loop.is_closed():
+                self._loop.call_soon_threadsafe(functools.partial(asyncio.ensure_future, self._next()))
             r, is_exc = self._q.get()
         if is_exc:
             if r is None:
@@ -223,7 +243,7 @@ class WrappedAsyncIterator(object):
                 raise r
         else:
             return r
-    
+
     def close(self):
         if self._async_iter is not None:
             async def async_close():
@@ -231,7 +251,8 @@ class WrappedAsyncIterator(object):
                     self._stop_future.set_result(None)
                 await self._async_iter.aclose()
             try:
-                self._loop.call_soon_threadsafe(functools.partial(asyncio.ensure_future, async_close(), loop=self._loop))
+                if not self._loop.is_closed():
+                    self._loop.call_soon_threadsafe(functools.partial(asyncio.ensure_future, async_close()))
             finally:
                 # Ensure __next__ ends
                 self._q.put((None, True))
