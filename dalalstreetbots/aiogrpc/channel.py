@@ -327,6 +327,12 @@ class Channel(_grpc.Channel):
         self._standalone_pool = standalone_pool_for_streaming
         self._subscribe_map = {}
 
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        await self.close()
+
     def subscribe(self, callback, try_to_connect=None):
         if callback in self._subscribe_map:
             wrapped_callback = self._subscribe_map[callback]
@@ -377,6 +383,14 @@ class Channel(_grpc.Channel):
             self._loop,
             self._executor,
             self._standalone_pool)
+
+    def close(self):
+        """
+        This method returns a future, so you should use `await channel.close()`, but call
+        `channel.close()` also close it (but did not wait for the closing)
+        """
+        return self._loop.run_in_executor(self._executor, self._channel.close)
+
 
 def channel_ready_future(channel):
     """Creates a Future that tracks when a Channel is ready.
