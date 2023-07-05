@@ -3,7 +3,7 @@ astroid==1.6.0
 asyncio==3.4.3
 blinker==1.4
 Click==7.0
-grpcio==1.26.0
+grpcio==1.53.0
 grpcio-tools==1.26.0
 h11==0.8.1
 h2==3.0.1
